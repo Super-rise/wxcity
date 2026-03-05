@@ -1,0 +1,1385 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>五行归城 · 测你的灵魂城市</title>
+<link href="https://fonts.googleapis.com/css2?family=Noto+Serif+SC:wght@300;400;600;700&family=Ma+Shan+Zheng&family=Zhi+Mang+Xing&display=swap" rel="stylesheet">
+<style>
+:root {
+  --wood-green: #3d6b4f;
+  --wood-light: #6aaa7e;
+  --fire-red: #c1392b;
+  --fire-light: #e8614f;
+  --earth-yellow: #b8860b;
+  --earth-light: #d4a017;
+  --metal-white: #c8c4bc;
+  --metal-light: #e8e4dc;
+  --water-blue: #1e4d6b;
+  --water-light: #2e7da8;
+  --void: #0c0e14;
+  --dim-text: rgba(224,218,205,0.45);
+  --mid-text: rgba(224,218,205,0.75);
+  --bright: #e8e2d5;
+  --gold: #c9a84c;
+  --gold-dim: rgba(201,168,76,0.18);
+  --gold-glow: rgba(201,168,76,0.28);
+  /* dynamic per result */
+  --el-color: #c9a84c;
+  --el-glow: rgba(201,168,76,0.3);
+}
+
+* { margin:0; padding:0; box-sizing:border-box; }
+
+body {
+  font-family: 'Noto Serif SC', serif;
+  background: #0c0e14;
+  color: var(--bright);
+  min-height: 100vh;
+  overflow-x: hidden;
+  cursor: default;
+}
+body::before {
+  content: '';
+  position: fixed; inset: 0; pointer-events: none; z-index: 0;
+  background:
+    radial-gradient(ellipse 70% 55% at 15% 10%, rgba(20,40,90,0.5) 0%, transparent 55%),
+    radial-gradient(ellipse 50% 40% at 85% 85%, rgba(80,35,12,0.35) 0%, transparent 50%),
+    radial-gradient(ellipse 35% 30% at 50% 50%, rgba(15,22,50,0.3) 0%, transparent 60%),
+    radial-gradient(ellipse 90% 80% at 50% 100%, rgba(12,14,20,0.8) 0%, transparent 40%);
+}
+
+/* ── NOISE OVERLAY ── */
+body::after {
+  content: '';
+  position: fixed;
+  inset: 0;
+  background-image: url("data:image/svg+xml,%3Csvg viewBox='0 0 256 256' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='noise'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.9' numOctaves='4' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23noise)' opacity='0.04'/%3E%3C/svg%3E");
+  pointer-events: none;
+  z-index: 999;
+  opacity: 0.5;
+  mix-blend-mode: overlay;
+}
+
+/* ── BACKGROUND CONSTELLATION ── */
+.bg-stars {
+  position: fixed;
+  inset: 0;
+  z-index: 1;
+  overflow: hidden;
+  pointer-events: none;
+}
+.star {
+  position: absolute;
+  border-radius: 50%;
+  background: var(--gold);
+  animation: twinkle var(--d, 3s) ease-in-out infinite;
+  animation-delay: var(--delay, 0s);
+}
+@keyframes twinkle {
+  0%,100% { opacity: var(--min-op, 0.1); transform: scale(1); }
+  50% { opacity: var(--max-op, 0.6); transform: scale(1.3); }
+}
+
+/* ── SCREENS ── */
+.screen {
+  position: relative;
+  z-index: 10;
+  min-height: 100vh;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  padding: 64px 24px;
+  opacity: 0;
+  transform: translateY(24px);
+  transition: opacity 0.9s cubic-bezier(0.16,1,0.3,1), transform 0.9s cubic-bezier(0.16,1,0.3,1);
+}
+.screen.active { opacity: 1; transform: translateY(0); }
+.screen.hidden { display: none; }
+
+/* ── BAGUA SYMBOL ── */
+.bagua-wrap {
+  width: 180px; height: 180px;
+  margin-bottom: 44px;
+  position: relative;
+}
+.bagua-outer {
+  width: 100%; height: 100%;
+  animation: rot-slow 50s linear infinite;
+  opacity: 0.5;
+}
+.bagua-inner {
+  position: absolute;
+  inset: 34px;
+  animation: rot-rev 28s linear infinite;
+  opacity: 0.8;
+}
+.bagua-center {
+  position: absolute;
+  inset: 72px;
+  animation: pulse-center 3s ease-in-out infinite;
+}
+@keyframes rot-slow { from { transform: rotate(0deg); } to { transform: rotate(360deg); } }
+@keyframes rot-rev { from { transform: rotate(0deg); } to { transform: rotate(-360deg); } }
+@keyframes pulse-center { 0%,100% { opacity: 0.5; transform: scale(1); } 50% { opacity: 1; transform: scale(1.15); } }
+
+/* ── INTRO TYPOGRAPHY ── */
+.eyebrow {
+  font-family: 'Noto Serif SC', serif;
+  font-size: 10px;
+  letter-spacing: 0.55em;
+  color: var(--gold);
+  text-transform: uppercase;
+  margin-bottom: 22px;
+  opacity: 0.75;
+}
+h1.main-title {
+  font-family: 'Ma Shan Zheng', cursive;
+  font-size: clamp(52px, 10vw, 96px);
+  font-weight: 400;
+  color: var(--bright);
+  text-align: center;
+  line-height: 1.05;
+  margin-bottom: 8px;
+  letter-spacing: 0.18em;
+  text-shadow: 0 0 80px rgba(201,168,76,0.2), 0 2px 40px rgba(0,0,0,0.5);
+}
+.title-sub {
+  font-family: 'Ma Shan Zheng', cursive;
+  font-size: clamp(18px, 3.5vw, 28px);
+  color: var(--gold);
+  text-align: center;
+  margin-bottom: 6px;
+  letter-spacing: 0.25em;
+  opacity: 0.7;
+}
+.title-en {
+  font-family: 'Noto Serif SC', serif;
+  font-size: 11px;
+  letter-spacing: 0.42em;
+  color: var(--mid-text);
+  text-align: center;
+  margin-bottom: 40px;
+  opacity: 0.55;
+}
+.divider {
+  display: flex; align-items: center; gap: 14px;
+  margin-bottom: 36px; width: 100%; max-width: 500px;
+}
+.divider-line { flex: 1; height: 1px; background: linear-gradient(90deg, transparent, rgba(201,168,76,0.3), transparent); }
+.divider-trigram { font-size: 16px; opacity: 0.5; color: var(--gold); }
+
+.intro-text {
+  max-width: 560px;
+  text-align: center;
+  line-height: 2.15;
+  color: var(--mid-text);
+  font-size: 15px;
+  margin-bottom: 14px;
+  letter-spacing: 0.02em;
+}
+.intro-note {
+  font-size: 11px;
+  color: var(--dim-text);
+  letter-spacing: 0.12em;
+  margin-bottom: 48px;
+  text-align: center;
+}
+
+/* ── FIVE ELEMENTS PREVIEW STRIP ── */
+.elements-strip {
+  display: flex; gap: 14px; margin-bottom: 52px;
+}
+.el-badge {
+  width: 56px; height: 56px;
+  border-radius: 50%;
+  display: flex; align-items: center; justify-content: center;
+  font-family: 'Ma Shan Zheng', cursive;
+  font-size: 22px;
+  border: 1px solid;
+  transition: all 0.4s cubic-bezier(0.34,1.56,0.64,1);
+  position: relative;
+}
+.el-badge::after {
+  content: '';
+  position: absolute; inset: -4px;
+  border-radius: 50%;
+  border: 1px solid;
+  opacity: 0;
+  transition: opacity 0.3s, transform 0.3s;
+  transform: scale(0.9);
+}
+.el-badge:hover { transform: scale(1.18) translateY(-3px); }
+.el-badge:hover::after { opacity: 0.4; transform: scale(1); }
+.el-wood { border-color: var(--wood-green); color: var(--wood-light); background: rgba(61,107,79,0.1); }
+.el-wood::after { border-color: var(--wood-green); }
+.el-fire { border-color: var(--fire-red); color: var(--fire-light); background: rgba(193,57,43,0.1); }
+.el-fire::after { border-color: var(--fire-red); }
+.el-earth { border-color: var(--earth-yellow); color: var(--earth-light); background: rgba(184,134,11,0.1); }
+.el-earth::after { border-color: var(--earth-yellow); }
+.el-metal { border-color: var(--metal-white); color: var(--metal-light); background: rgba(200,196,188,0.1); }
+.el-metal::after { border-color: var(--metal-white); }
+.el-water { border-color: var(--water-blue); color: var(--water-light); background: rgba(30,77,107,0.1); }
+.el-water::after { border-color: var(--water-blue); }
+
+/* ── BUTTON ── */
+.btn-start {
+  font-family: 'Noto Serif SC', serif;
+  font-size: 14px;
+  letter-spacing: 0.32em;
+  color: #0c0e14;
+  background: linear-gradient(135deg, #dab850, #b88828, #dab850);
+  background-size: 200% 100%;
+  border: none;
+  padding: 20px 64px;
+  cursor: pointer;
+  position: relative;
+  transition: all 0.4s ease;
+  clip-path: polygon(12px 0%, 100% 0%, calc(100% - 12px) 100%, 0% 100%);
+  box-shadow: 0 4px 40px rgba(201,168,76,0.2), 0 0 0 1px rgba(201,168,76,0.15);
+  animation: btn-shimmer 3s ease-in-out infinite;
+}
+@keyframes btn-shimmer {
+  0%,100% { background-position: 0% 50%; }
+  50% { background-position: 100% 50%; }
+}
+.btn-start:hover {
+  transform: translateY(-4px);
+  box-shadow: 0 16px 48px rgba(201,168,76,0.35), 0 0 0 1px rgba(201,168,76,0.3);
+}
+
+/* ── PROGRESS ── */
+.progress-wrap { width: 100%; max-width: 740px; margin-bottom: 32px; }
+.progress-top {
+  display: flex; justify-content: space-between; align-items: center;
+  margin-bottom: 14px;
+}
+.progress-label {
+  font-family: 'Noto Serif SC', serif;
+  font-size: 10px; letter-spacing: 0.4em; color: var(--gold); opacity: 0.8;
+}
+.progress-nums {
+  font-family: 'Noto Serif SC', serif;
+  font-size: 13px; color: var(--mid-text); letter-spacing: 0.1em;
+}
+.progress-nums strong { color: var(--gold); font-size: 18px; }
+.progress-track {
+  height: 2px;
+  background: rgba(201,168,76,0.12);
+  position: relative;
+}
+.progress-fill {
+  height: 100%;
+  background: linear-gradient(90deg, var(--water-blue), var(--wood-green), var(--fire-red), var(--earth-yellow));
+  background-size: 300% 100%;
+  animation: gradient-shift 4s linear infinite;
+  transition: width 0.7s cubic-bezier(0.4,0,0.2,1);
+  position: relative;
+}
+.progress-fill::after {
+  content: ''; position: absolute; right: -3px; top: 50%; transform: translateY(-50%);
+  width: 6px; height: 6px; background: var(--gold); border-radius: 50%;
+  box-shadow: 0 0 8px var(--gold);
+}
+@keyframes gradient-shift {
+  0% { background-position: 0% 50%; }
+  100% { background-position: 300% 50%; }
+}
+
+/* ── DIMENSION INDICATOR ── */
+.dim-indicator {
+  display: flex; align-items: center; gap: 8px; margin-bottom: 24px;
+}
+.dim-dot { width: 8px; height: 8px; border-radius: 50%; }
+.dim-label { font-size: 10px; letter-spacing: 0.3em; color: var(--dim-text); }
+
+/* ── QUESTION CARD ── */
+.q-wrap { width: 100%; max-width: 740px; overflow: hidden; }
+.q-card {
+  background: linear-gradient(145deg, rgba(24,22,32,0.9), rgba(18,16,26,0.95));
+  border: 1px solid rgba(201,168,76,0.2);
+  padding: 44px 40px 38px;
+  position: relative;
+  backdrop-filter: blur(16px);
+  box-shadow: 0 12px 60px rgba(0,0,0,0.5), inset 0 1px 0 rgba(255,255,255,0.04), inset 0 -1px 0 rgba(0,0,0,0.2);
+}
+.q-card::before {
+  content: '';
+  position: absolute; top: 0; left: 0; right: 0;
+  height: 2px;
+  background: linear-gradient(90deg, transparent 0%, var(--current-element-color, var(--gold)) 40%, var(--current-element-color, var(--gold)) 60%, transparent 100%);
+  transition: background 0.6s ease;
+  opacity: 0.8;
+}
+.q-card::after {
+  content: '';
+  position: absolute; top: 0; left: 0; right: 0; bottom: 0;
+  background: radial-gradient(ellipse 60% 40% at 50% 0%, rgba(201,168,76,0.04) 0%, transparent 70%);
+  pointer-events: none;
+}
+
+.q-num {
+  font-family: 'Noto Serif SC', serif;
+  font-size: 9px; letter-spacing: 0.55em;
+  color: var(--gold); margin-bottom: 26px;
+  display: flex; align-items: center; gap: 14px; opacity: 0.65;
+}
+.q-num::after { content: ''; flex: 1; height: 1px; background: linear-gradient(90deg, rgba(201,168,76,0.25), transparent); }
+
+.q-text {
+  font-family: 'Noto Serif SC', serif;
+  font-size: clamp(17px, 2.6vw, 23px);
+  font-weight: 400;
+  line-height: 1.95;
+  color: var(--bright);
+  margin-bottom: 40px;
+  letter-spacing: 0.05em;
+}
+
+/* ── LIKERT SCALE ── */
+.likert-wrap { width: 100%; }
+.likert-strip {
+  display: flex; width: 100%;
+  border: 1px solid rgba(201,168,76,0.14);
+  overflow: hidden;
+  border-radius: 2px;
+}
+.lk-cell {
+  flex: 1; cursor: pointer;
+  display: flex; flex-direction: column;
+  align-items: center; justify-content: center;
+  padding: 20px 6px 18px; gap: 11px;
+  background: transparent; border: none;
+  border-right: 1px solid rgba(201,168,76,0.08);
+  transition: background 0.2s ease, transform 0.1s ease;
+  outline: none; position: relative;
+}
+.lk-cell:last-child { border-right: none; }
+.lk-cell:active { transform: scale(0.97); }
+.lk-dot {
+  width: 14px; height: 14px; border-radius: 50%;
+  border: 1.5px solid rgba(201,168,76,0.28);
+  background: transparent;
+  transition: all 0.22s ease;
+  flex-shrink: 0;
+}
+.lk-text {
+  font-family: 'Noto Serif SC', serif;
+  font-size: 10px; color: var(--dim-text);
+  text-align: center; line-height: 1.45;
+  transition: color 0.2s;
+}
+.lk-cell:hover { background: rgba(201,168,76,0.06); }
+.lk-cell:hover .lk-dot { border-color: var(--gold); background: rgba(201,168,76,0.18); transform: scale(1.2); }
+.lk-cell:hover .lk-text { color: var(--mid-text); }
+
+/* Selected states */
+.lk-cell.sel-1 { background: rgba(193,57,43,0.13); }
+.lk-cell.sel-1 .lk-dot { background: var(--fire-red); border-color: var(--fire-red); box-shadow: 0 0 12px rgba(193,57,43,0.6); transform: scale(1.15); }
+.lk-cell.sel-1 .lk-text { color: #f07060; font-weight: 600; }
+
+.lk-cell.sel-2 { background: rgba(184,134,11,0.1); }
+.lk-cell.sel-2 .lk-dot { background: var(--earth-yellow); border-color: var(--earth-yellow); box-shadow: 0 0 10px rgba(184,134,11,0.5); transform: scale(1.1); }
+.lk-cell.sel-2 .lk-text { color: var(--earth-light); font-weight: 600; }
+
+.lk-cell.sel-3 { background: rgba(200,196,188,0.06); }
+.lk-cell.sel-3 .lk-dot { background: rgba(200,196,188,0.5); border-color: var(--metal-white); transform: scale(1.05); }
+.lk-cell.sel-3 .lk-text { color: var(--metal-light); font-weight: 600; }
+
+.lk-cell.sel-4 { background: rgba(61,107,79,0.1); }
+.lk-cell.sel-4 .lk-dot { background: var(--wood-green); border-color: var(--wood-green); box-shadow: 0 0 10px rgba(61,107,79,0.5); transform: scale(1.1); }
+.lk-cell.sel-4 .lk-text { color: var(--wood-light); font-weight: 600; }
+
+.lk-cell.sel-5 { background: rgba(30,77,107,0.13); }
+.lk-cell.sel-5 .lk-dot { background: var(--water-blue); border-color: var(--water-light); box-shadow: 0 0 10px rgba(30,77,107,0.6); transform: scale(1.1); }
+.lk-cell.sel-5 .lk-text { color: var(--water-light); font-weight: 600; }
+
+.lk-endpoints {
+  display: flex; justify-content: space-between;
+  margin-top: 10px; padding: 0 4px;
+}
+.lk-ep { font-size: 10px; color: var(--dim-text); letter-spacing: 0.08em; }
+
+/* ── NAV BUTTONS ── */
+.nav-row {
+  display: flex; gap: 12px; margin-top: 24px; justify-content: space-between;
+  width: 100%; max-width: 740px;
+}
+.btn-nav {
+  font-family: 'Noto Serif SC', serif;
+  font-size: 11px; letter-spacing: 0.2em;
+  padding: 13px 28px; border: 1px solid rgba(201,168,76,0.22);
+  background: transparent; color: var(--dim-text); cursor: pointer;
+  transition: all 0.25s; display: flex; align-items: center; gap: 8px;
+}
+.btn-nav:hover:not(:disabled) { border-color: var(--gold); color: var(--bright); }
+.btn-nav:disabled { opacity: 0.2; cursor: not-allowed; }
+.btn-submit {
+  font-family: 'Noto Serif SC', serif;
+  font-size: 12px; letter-spacing: 0.25em;
+  padding: 13px 36px;
+  background: linear-gradient(135deg, var(--gold), #906820);
+  color: var(--void); border: none; cursor: pointer;
+  transition: all 0.3s; display: none; align-items: center; gap: 8px;
+  clip-path: polygon(6px 0%, 100% 0%, calc(100% - 6px) 100%, 0% 100%);
+}
+.btn-submit:hover { transform: translateY(-1px); box-shadow: 0 6px 24px rgba(201,168,76,0.3); }
+.btn-submit.show { display: flex; }
+
+/* ── SLIDE ANIMATIONS ── */
+.slide-out-left { animation: soleft 0.28s ease forwards; }
+.slide-in-right { animation: siright 0.28s ease forwards; }
+.slide-out-right { animation: soright 0.28s ease forwards; }
+.slide-in-left { animation: sileft 0.28s ease forwards; }
+@keyframes soleft { to { transform: translateX(-50px); opacity: 0; } }
+@keyframes siright { from { transform: translateX(50px); opacity: 0; } to { transform: translateX(0); opacity: 1; } }
+@keyframes soright { to { transform: translateX(50px); opacity: 0; } }
+@keyframes sileft { from { transform: translateX(-50px); opacity: 0; } to { transform: translateX(0); opacity: 1; } }
+
+/* ── MODAL ── */
+.modal-bg {
+  position: fixed; inset: 0; background: rgba(9,9,11,0.8); z-index: 500;
+  display: flex; align-items: center; justify-content: center;
+  opacity: 0; pointer-events: none; transition: opacity 0.3s;
+}
+.modal-bg.open { opacity: 1; pointer-events: all; }
+.modal-box {
+  background: #1a1828; border: 1px solid rgba(201,168,76,0.3);
+  padding: 48px; max-width: 520px; width: 90%;
+  box-shadow: 0 30px 80px rgba(0,0,0,0.6);
+  position: relative;
+}
+.modal-box::before {
+  content: ''; position: absolute; top: 0; left: 0; right: 0;
+  height: 2px; background: linear-gradient(90deg, transparent, var(--fire-red), transparent);
+}
+.modal-t { font-size: 13px; letter-spacing: 0.3em; color: var(--fire-light); margin-bottom: 8px; }
+.modal-s { font-size: 14px; color: var(--dim-text); margin-bottom: 24px; line-height: 1.7; }
+.modal-grid { display: flex; flex-wrap: wrap; gap: 8px; margin-bottom: 28px; }
+.unanswered-btn {
+  font-size: 11px; padding: 7px 14px; border: 1px solid rgba(193,57,43,0.4);
+  background: transparent; color: var(--fire-light); cursor: pointer; transition: all 0.2s;
+  letter-spacing: 0.1em;
+}
+.unanswered-btn:hover { background: var(--fire-red); color: var(--bright); }
+.modal-cancel {
+  font-size: 11px; letter-spacing: 0.25em; padding: 11px 28px;
+  border: 1px solid rgba(201,168,76,0.2); background: transparent;
+  color: var(--dim-text); cursor: pointer; transition: all 0.2s;
+}
+.modal-cancel:hover { border-color: var(--gold); color: var(--bright); }
+
+/* ── LOADING ── */
+.loading-screen {
+  position: fixed; inset: 0;
+  background: linear-gradient(160deg, #0f1420 0%, #121620 40%, #14100e 100%);
+  z-index: 300;
+  display: flex; flex-direction: column; align-items: center; justify-content: center;
+  gap: 24px; transition: opacity 0.8s ease;
+}
+.loading-screen.fade-out { opacity: 0; pointer-events: none; }
+.loading-taiji { width: 64px; height: 64px; animation: taiji-spin 3s linear infinite; }
+.loading-taiji path { fill: none; stroke: var(--gold); stroke-width: 1.5; }
+.loading-t { font-size: 10px; letter-spacing: 0.5em; color: var(--dim-text); animation: pulse 2s ease-in-out infinite; }
+@keyframes taiji-spin { to { transform: rotate(360deg); } }
+@keyframes pulse { 0%,100% { opacity: 0.3; } 50% { opacity: 1; } }
+
+/* ── CALCULATING SCREEN ── */
+#calc-screen {
+  background: var(--void);
+}
+.calc-hexagram {
+  width: 100px; height: 100px;
+  margin-bottom: 32px;
+  animation: rotate-pulse 2s ease-in-out infinite;
+}
+@keyframes rotate-pulse {
+  0% { transform: rotate(0deg) scale(1); opacity: 0.6; }
+  50% { transform: rotate(180deg) scale(1.1); opacity: 1; }
+  100% { transform: rotate(360deg) scale(1); opacity: 0.6; }
+}
+.calc-text { font-size: 13px; letter-spacing: 0.5em; color: var(--gold); opacity: 0.7; transition: opacity 0.3s ease; }
+
+/* ═══════════════════════════════════════════
+   RESULT SCREEN
+═══════════════════════════════════════════ */
+#result-screen {
+  padding: 80px 24px 120px;
+  justify-content: flex-start;
+  max-width: 960px;
+  margin: 0 auto;
+  width: 100%;
+}
+
+/* BIG REVEAL HERO */
+.result-hero {
+  width: 100%;
+  display: flex; flex-direction: column; align-items: center;
+  margin-bottom: 60px;
+  position: relative;
+  padding: 64px 32px 56px;
+  background: linear-gradient(160deg, rgba(20,18,28,0.95), rgba(14,12,20,0.98));
+  border: 1px solid rgba(201,168,76,0.15);
+  box-shadow: 0 0 100px rgba(0,0,0,0.4), inset 0 1px 0 rgba(255,255,255,0.03);
+  overflow: hidden;
+}
+.result-hero::before {
+  content: '';
+  position: absolute; inset: 0;
+  background: radial-gradient(ellipse 70% 60% at 50% 0%, var(--el-glow, rgba(201,168,76,0.12)) 0%, transparent 60%);
+  pointer-events: none;
+}
+.result-hero::after {
+  content: '';
+  position: absolute; top: 0; left: 0; right: 0; height: 2px;
+  background: linear-gradient(90deg, transparent 0%, var(--el-color, var(--gold)) 30%, var(--el-color, var(--gold)) 70%, transparent 100%);
+  opacity: 0.7;
+}
+
+.result-element-glyph {
+  width: 88px; height: 88px; margin-bottom: 24px;
+  filter: drop-shadow(0 0 32px var(--el-glow, rgba(201,168,76,0.4)));
+  animation: float-glyph 5s ease-in-out infinite;
+  position: relative; z-index: 1;
+}
+@keyframes float-glyph {
+  0%,100% { transform: translateY(0px) rotate(0deg); }
+  33% { transform: translateY(-6px) rotate(1deg); }
+  66% { transform: translateY(-4px) rotate(-1deg); }
+}
+
+.result-element-name {
+  font-family: 'Ma Shan Zheng', cursive;
+  font-size: clamp(20px, 4vw, 28px);
+  font-weight: 400;
+  line-height: 1;
+  margin-bottom: 4px;
+  color: var(--el-color);
+  letter-spacing: 0.6em;
+  text-shadow: 0 0 30px var(--el-glow);
+  position: relative; z-index: 1;
+}
+
+.result-city-name {
+  font-family: 'Ma Shan Zheng', cursive;
+  font-size: clamp(60px, 14vw, 108px);
+  color: var(--bright);
+  line-height: 0.9;
+  letter-spacing: 0.15em;
+  margin-bottom: 16px;
+  text-shadow: 0 4px 60px rgba(0,0,0,0.6), 0 0 80px var(--el-glow);
+  position: relative; z-index: 1;
+}
+
+.result-city-sub {
+  font-size: 12px; letter-spacing: 0.45em; color: var(--gold); opacity: 0.65;
+  margin-bottom: 28px; position: relative; z-index: 1;
+}
+
+.result-divider {
+  display: flex; align-items: center; gap: 14px;
+  width: 100%; max-width: 560px; margin-bottom: 28px;
+  position: relative; z-index: 1;
+}
+.result-divider .dl { flex: 1; height: 1px; background: linear-gradient(90deg, transparent, rgba(201,168,76,0.35), transparent); }
+.result-divider .dc { font-size: 14px; color: var(--gold); opacity: 0.6; }
+
+.result-headline {
+  max-width: 580px; text-align: center; line-height: 2.1;
+  color: var(--mid-text); font-size: 14.5px; letter-spacing: 0.03em;
+  position: relative; z-index: 1;
+}
+
+/* TOP 3 CITIES ROW */
+.top3-wrap {
+  width: 100%; max-width: 960px;
+  margin-bottom: 28px;
+}
+.top3-label { font-size: 9px; letter-spacing: 0.55em; color: var(--gold); opacity: 0.6; margin-bottom: 14px; text-align: center; }
+.top3-row { display: grid; grid-template-columns: 1fr 1fr 1fr; gap: 12px; }
+.top3-card {
+  background: rgba(20,18,28,0.8);
+  border: 1px solid rgba(201,168,76,0.1);
+  padding: 20px 16px;
+  position: relative;
+  transition: all 0.25s ease;
+  text-align: center;
+}
+.top3-card:hover { border-color: rgba(201,168,76,0.25); background: rgba(28,26,38,0.9); }
+.top3-card.rank-1 { border-color: rgba(201,168,76,0.28); }
+.top3-card.rank-1::before {
+  content: '';
+  position: absolute; top: 0; left: 0; right: 0; height: 1px;
+  background: linear-gradient(90deg, transparent, var(--el-color), transparent);
+}
+.top3-rank { font-size: 9px; letter-spacing: 0.4em; color: var(--gold); opacity: 0.5; margin-bottom: 8px; }
+.top3-rank.rank-gold { opacity: 0.9; color: var(--gold); }
+.top3-city-name { font-family: 'Ma Shan Zheng', cursive; font-size: 22px; color: var(--bright); margin-bottom: 4px; }
+.top3-card.rank-1 .top3-city-name { color: var(--el-color); font-size: 26px; }
+.top3-el { font-size: 10px; color: var(--dim-text); letter-spacing: 0.1em; margin-bottom: 8px; }
+.top3-pct-bar { height: 3px; background: rgba(255,255,255,0.06); margin-bottom: 4px; overflow: hidden; }
+.top3-pct-fill { height: 100%; background: var(--el-color); transition: width 1.2s cubic-bezier(0.16,1,0.3,1); }
+.top3-pct-num { font-size: 11px; color: var(--el-color); letter-spacing: 0.1em; opacity: 0.8; }
+
+/* SCORE PENTAGON */
+.pentagon-wrap {
+  width: 100%; max-width: 960px;
+  background: rgba(18,16,26,0.85);
+  border: 1px solid rgba(201,168,76,0.12);
+  padding: 36px 40px;
+  margin-bottom: 24px;
+  backdrop-filter: blur(8px);
+  box-shadow: 0 4px 40px rgba(0,0,0,0.3);
+}
+.pentagon-title {
+  font-size: 9px; letter-spacing: 0.5em; color: var(--gold); opacity: 0.6;
+  text-align: center; margin-bottom: 28px;
+}
+.pentagon-bars { display: flex; flex-direction: column; gap: 16px; }
+.p-bar-row { display: grid; grid-template-columns: 56px 1fr 52px; align-items: center; gap: 16px; }
+.p-bar-label { font-family: 'Ma Shan Zheng', cursive; font-size: 15px; text-align: right; }
+.p-bar-track { height: 5px; background: rgba(255,255,255,0.06); position: relative; }
+.p-bar-fill { height: 100%; transition: width 1.6s cubic-bezier(0.16,1,0.3,1); }
+.p-bar-pct { font-size: 11px; letter-spacing: 0.05em; text-align: right; opacity: 0.8; }
+.el-wood-bar { background: linear-gradient(90deg, var(--wood-green), var(--wood-light)); }
+.el-fire-bar { background: linear-gradient(90deg, var(--fire-red), var(--fire-light)); }
+.el-earth-bar { background: linear-gradient(90deg, var(--earth-yellow), var(--earth-light)); }
+.el-metal-bar { background: linear-gradient(90deg, rgba(160,156,150,0.8), var(--metal-light)); }
+.el-water-bar { background: linear-gradient(90deg, var(--water-blue), var(--water-light)); }
+
+/* RESULT SECTIONS */
+.result-grid {
+  width: 100%; max-width: 960px;
+  display: grid; grid-template-columns: 1fr 1fr;
+  gap: 16px; margin-bottom: 16px;
+}
+.result-grid.full { grid-template-columns: 1fr; }
+
+.r-card {
+  background: rgba(18,16,26,0.85);
+  border: 1px solid rgba(201,168,76,0.1);
+  padding: 28px 26px;
+  position: relative;
+  overflow: hidden;
+  backdrop-filter: blur(8px);
+  transition: border-color 0.3s;
+}
+.r-card:hover { border-color: rgba(201,168,76,0.2); }
+.r-card::before {
+  content: '';
+  position: absolute; top: 0; left: 0; bottom: 0;
+  width: 2px;
+  background: linear-gradient(180deg, var(--el-color, var(--gold)), transparent);
+  opacity: 0.5;
+}
+.r-card-eyebrow { font-size: 9px; letter-spacing: 0.48em; color: var(--gold); opacity: 0.55; margin-bottom: 10px; }
+.r-card-title { font-family: 'Ma Shan Zheng', cursive; font-size: 20px; color: var(--bright); margin-bottom: 12px; }
+.r-card-body { font-size: 14px; line-height: 2.05; color: var(--mid-text); }
+.r-card-body strong { color: var(--bright); font-weight: 600; }
+
+/* SPOTS GRID */
+.spots-grid {
+  display: grid; grid-template-columns: repeat(2, 1fr);
+  gap: 10px; margin-top: 16px;
+}
+.spot-item {
+  padding: 12px 16px;
+  border: 1px solid rgba(201,168,76,0.12);
+  background: rgba(201,168,76,0.03);
+  transition: all 0.2s;
+  position: relative; overflow: hidden;
+}
+.spot-item::before {
+  content: '';
+  position: absolute; left: 0; top: 0; bottom: 0;
+  width: 2px; background: var(--el-color); opacity: 0.4;
+  transition: opacity 0.2s;
+}
+.spot-item:hover { border-color: rgba(201,168,76,0.25); }
+.spot-item:hover::before { opacity: 0.8; }
+.spot-name { font-family: 'Ma Shan Zheng', cursive; font-size: 16px; color: var(--bright); }
+
+.trait-chips { display: flex; flex-wrap: wrap; gap: 8px; margin-top: 14px; }
+.trait-chip {
+  font-size: 11px; padding: 6px 14px;
+  border: 1px solid; letter-spacing: 0.06em;
+  transition: all 0.2s;
+}
+.trait-chip:hover { background: rgba(255,255,255,0.04); }
+
+.btn-restart {
+  margin-top: 52px; font-size: 11px; letter-spacing: 0.35em;
+  padding: 16px 56px; border: 1px solid rgba(201,168,76,0.22);
+  background: transparent; color: var(--dim-text); cursor: pointer; transition: all 0.35s;
+}
+.btn-restart:hover { border-color: var(--gold); color: var(--bright); background: rgba(201,168,76,0.04); }
+
+@media (max-width: 700px) {
+  .result-grid { grid-template-columns: 1fr; }
+  .top3-row { grid-template-columns: 1fr; gap: 8px; }
+  .q-card { padding: 28px 18px 24px; }
+  .q-text { font-size: 16px; }
+  .lk-cell { padding: 14px 3px 12px; }
+  .lk-text { font-size: 9px; }
+  .pentagon-wrap { padding: 24px 16px; }
+  .r-card { padding: 22px 16px; }
+  .result-city-name { font-size: 56px; }
+  .result-hero { padding: 48px 20px 40px; }
+  .spots-grid { grid-template-columns: 1fr; }
+}
+</style>
+</head>
+<body>
+
+<!-- STARS -->
+<div class="bg-stars" id="stars"></div>
+
+<!-- LOADING -->
+<div class="loading-screen" id="loading">
+  <svg class="loading-taiji" viewBox="0 0 64 64">
+    <path d="M32 4 A28 28 0 1 1 32 60 A14 14 0 1 1 32 32 A14 14 0 1 0 32 4"/>
+    <circle cx="32" cy="18" r="3" fill="rgba(201,168,76,0.8)" stroke="none"/>
+    <circle cx="32" cy="46" r="3" fill="rgba(9,9,11,0.9)" stroke="var(--gold)" stroke-width="1"/>
+  </svg>
+  <div class="loading-t">正在感知天地气运 · · ·</div>
+</div>
+
+<!-- UNANSWERED MODAL -->
+<div class="modal-bg" id="modal">
+  <div class="modal-box">
+    <div class="modal-t">⚠ 测算尚未完整</div>
+    <div class="modal-s" id="modal-s">以下题目尚未作答，气运不可缺失：</div>
+    <div class="modal-grid" id="modal-grid"></div>
+    <button class="modal-cancel" onclick="closeModal()">继续作答</button>
+  </div>
+</div>
+
+<!-- ══════════ INTRO ══════════ -->
+<div class="screen hidden" id="intro-screen">
+  <div class="bagua-wrap">
+    <svg class="bagua-outer" viewBox="0 0 180 180" fill="none">
+      <circle cx="90" cy="90" r="85" stroke="#c9a84c" stroke-width="0.5" stroke-dasharray="2 6" opacity="0.6"/>
+      <circle cx="90" cy="90" r="72" stroke="#c9a84c" stroke-width="0.4" opacity="0.35"/>
+      <!-- 8 directions -->
+      <g stroke="#c9a84c" stroke-width="0.8" opacity="0.5">
+        <line x1="90" y1="7" x2="90" y2="22"/>
+        <line x1="90" y1="158" x2="90" y2="173"/>
+        <line x1="7" y1="90" x2="22" y2="90"/>
+        <line x1="158" y1="90" x2="173" y2="90"/>
+        <line x1="27" y1="27" x2="38" y2="38"/>
+        <line x1="142" y1="27" x2="153" y2="38"/>
+        <line x1="27" y1="153" x2="38" y2="142"/>
+        <line x1="142" y1="153" x2="153" y2="142"/>
+      </g>
+      <!-- Star of David -->
+      <polygon points="90,14 162,122 18,122" stroke="#c9a84c" stroke-width="0.5" fill="none" opacity="0.25"/>
+      <polygon points="90,166 18,58 162,58" stroke="#c9a84c" stroke-width="0.5" fill="none" opacity="0.25"/>
+    </svg>
+    <svg class="bagua-inner" viewBox="0 0 112 112" fill="none">
+      <circle cx="56" cy="56" r="50" stroke="#c9a84c" stroke-width="1" opacity="0.55"/>
+      <circle cx="56" cy="56" r="38" stroke="#c9a84c" stroke-width="0.5" opacity="0.3"/>
+      <!-- taiji path -->
+      <path d="M56 6 A50 50 0 0 1 56 106 A25 25 0 0 1 56 56 A25 25 0 0 0 56 6" stroke="#c9a84c" stroke-width="0.9" fill="none"/>
+      <circle cx="56" cy="31" r="6" fill="rgba(201,168,76,0.55)"/>
+      <circle cx="56" cy="81" r="6" fill="transparent" stroke="#c9a84c" stroke-width="1.2"/>
+    </svg>
+    <svg class="bagua-center" viewBox="0 0 36 36" fill="none">
+      <circle cx="18" cy="18" r="14" stroke="#c9a84c" stroke-width="1" opacity="0.6"/>
+      <circle cx="18" cy="18" r="5" fill="rgba(201,168,76,0.4)"/>
+    </svg>
+  </div>
+  
+  <div class="eyebrow">中国传统命理量表 · 五行归城</div>
+  <h1 class="main-title">五行归城</h1>
+  <div class="title-sub">测你的灵魂城市</div>
+  <div class="title-en">THE FIVE ELEMENTS · CITY RESONANCE TEST</div>
+  
+  <div class="divider">
+    <div class="divider-line"></div>
+    <div class="divider-trigram">☯</div>
+    <div class="divider-line"></div>
+  </div>
+  
+  <p class="intro-text">
+    木火土金水，天地之五气，万物皆由此而生。<br>
+    每座城市有其气场，每个人心中藏有本命之元素。<br><br>
+    本测试以现代量表心理学为基础，融合传统五行学说，<br>
+    通过 <strong>30</strong> 道行为倾向题目，
+    从<strong>生命律动、空间感知、时间偏好、情绪质感、决策模式</strong>五个维度，<br>
+    为你推算最契合灵魂的中国城市。
+  </p>
+  <div class="intro-note">每题采用五级量表 · 请依第一直觉作答 · 无需过度思虑</div>
+  
+  <div class="elements-strip">
+    <div class="el-badge el-wood">木</div>
+    <div class="el-badge el-fire">火</div>
+    <div class="el-badge el-earth">土</div>
+    <div class="el-badge el-metal">金</div>
+    <div class="el-badge el-water">水</div>
+  </div>
+  
+  <button class="btn-start" onclick="startTest()">叩问天机</button>
+</div>
+
+<!-- ══════════ QUIZ ══════════ -->
+<div class="screen hidden" id="quiz-screen" style="padding-top: 48px; justify-content: flex-start;">
+  <div class="progress-wrap">
+    <div class="progress-top">
+      <div class="progress-label">五行测算进度</div>
+      <div class="progress-nums"><strong id="cur-q">1</strong> / 30</div>
+    </div>
+    <div class="progress-track">
+      <div class="progress-fill" id="prog-fill" style="width:0%"></div>
+    </div>
+  </div>
+  
+  <div class="dim-indicator" id="dim-indicator">
+    <div class="dim-dot" id="dim-dot"></div>
+    <div class="dim-label" id="dim-label"></div>
+  </div>
+  
+  <div class="q-wrap">
+    <div class="q-card" id="q-card">
+      <div class="q-num" id="q-num">QUESTION 01</div>
+      <div class="q-text" id="q-text"></div>
+      <div class="likert-wrap">
+        <div class="likert-strip" id="likert-strip">
+          <button class="lk-cell" data-val="1" onclick="selectAnswer(1)">
+            <div class="lk-dot"></div><div class="lk-text">非常<br>符合</div>
+          </button>
+          <button class="lk-cell" data-val="2" onclick="selectAnswer(2)">
+            <div class="lk-dot"></div><div class="lk-text">比较<br>符合</div>
+          </button>
+          <button class="lk-cell" data-val="3" onclick="selectAnswer(3)">
+            <div class="lk-dot"></div><div class="lk-text">不确<br>定</div>
+          </button>
+          <button class="lk-cell" data-val="4" onclick="selectAnswer(4)">
+            <div class="lk-dot"></div><div class="lk-text">较不<br>符合</div>
+          </button>
+          <button class="lk-cell" data-val="5" onclick="selectAnswer(5)">
+            <div class="lk-dot"></div><div class="lk-text">完全<br>不符</div>
+          </button>
+        </div>
+        <div class="lk-endpoints">
+          <div class="lk-ep">↑ 高度认同</div>
+          <div class="lk-ep">高度否认 ↑</div>
+        </div>
+      </div>
+    </div>
+  </div>
+  
+  <div class="nav-row">
+    <button class="btn-nav" id="btn-prev" onclick="goTo(currentQ-1)" disabled>← 上一题</button>
+    <button class="btn-nav" id="btn-next" onclick="goTo(currentQ+1)">下一题 →</button>
+    <button class="btn-submit" id="btn-submit" onclick="trySubmit()">推演命格 ✦</button>
+  </div>
+</div>
+
+<!-- ══════════ CALCULATING ══════════ -->
+<div class="screen hidden" id="calc-screen">
+  <svg class="calc-hexagram" viewBox="0 0 100 100" fill="none">
+    <polygon points="50,5 95,77.5 5,77.5" stroke="#c9a84c" stroke-width="1" opacity="0.8"/>
+    <polygon points="50,95 5,22.5 95,22.5" stroke="#c9a84c" stroke-width="1" opacity="0.8"/>
+    <circle cx="50" cy="50" r="22" stroke="#c9a84c" stroke-width="0.8" opacity="0.5"/>
+    <circle cx="50" cy="50" r="8" fill="rgba(201,168,76,0.35)"/>
+    <circle cx="50" cy="50" r="3" fill="rgba(201,168,76,0.7)"/>
+  </svg>
+  <div class="calc-text" id="calc-text">正在感知天地气运 · · ·</div>
+  <div style="margin-top:16px;display:flex;gap:6px;align-items:center;" id="calc-dots">
+    <div style="width:4px;height:4px;border-radius:50%;background:rgba(201,168,76,0.4);animation:pulse 1.4s 0s infinite ease-in-out;"></div>
+    <div style="width:4px;height:4px;border-radius:50%;background:rgba(201,168,76,0.4);animation:pulse 1.4s 0.2s infinite ease-in-out;"></div>
+    <div style="width:4px;height:4px;border-radius:50%;background:rgba(201,168,76,0.4);animation:pulse 1.4s 0.4s infinite ease-in-out;"></div>
+  </div>
+</div>
+
+<!-- ══════════ RESULT ══════════ -->
+<div class="screen hidden" id="result-screen">
+  <div class="result-hero">
+    <svg class="result-element-glyph" id="result-glyph" viewBox="0 0 100 100"></svg>
+    <div class="result-element-name" id="result-el-name"></div>
+    <div class="result-city-name" id="result-city-name"></div>
+    <div class="result-city-sub" id="result-city-sub"></div>
+    <div class="result-divider">
+      <div class="dl"></div>
+      <div class="dc">◈</div>
+      <div class="dl"></div>
+    </div>
+    <p class="result-headline" id="result-headline"></p>
+  </div>
+
+  <!-- TOP 3 CITIES -->
+  <div class="top3-wrap">
+    <div class="top3-label">匹配度排行 · CITY RESONANCE RANKING</div>
+    <div class="top3-row" id="top3-row"></div>
+  </div>
+  
+  <!-- PENTAGON BARS -->
+  <div class="pentagon-wrap">
+    <div class="pentagon-title">五行能量分布 · FIVE ELEMENTS DISTRIBUTION</div>
+    <div class="pentagon-bars" id="pentagon-bars"></div>
+  </div>
+  
+  <!-- MAIN INFO GRID -->
+  <div class="result-grid" id="result-grid-1"></div>
+  <div class="result-grid full" id="result-grid-2"></div>
+  <div class="result-grid" id="result-grid-3"></div>
+  
+  <button class="btn-restart" onclick="restartTest()">重新叩问天机</button>
+</div>
+
+<script>
+/* ══════════════════════════════════════
+   QUESTIONS  (30题, 5维度各6题)
+   维度：
+   A = 生命律动 (wood tendency)   Q1-6
+   B = 热情能量 (fire tendency)   Q7-12
+   C = 稳重深根 (earth tendency)  Q13-18
+   D = 精准纯粹 (metal tendency)  Q19-24
+   E = 流动内省 (water tendency)  Q25-30
+   
+   每题 pole 标注该题目哪端得分对应哪个元素
+   正向(1-2)=该维度，反向(4-5)=另元素倾向
+   Scoring: val 1→+2, 2→+1, 3→0, 4→-1, 5→-2
+   对应 pole 正向计入本维度，反向计入对立维度
+══════════════════════════════════════ */
+const QUESTIONS = [
+  // ── 维度A：生命律动 · 木 (Growth, expansion, vitality)
+  { d:'A', text:'在陌生的城市，我会主动探索还没有人推荐过的街道和区域。', pole:1 },
+  { d:'A', text:'面对新项目，我往往是最先热情投入、最快建立框架的那个人。', pole:1 },
+  { d:'A', text:'我喜欢在早晨制定计划，期待一天中不断有新进展发生。', pole:1 },
+  { d:'A', text:'我认为停滞不前是件令人焦虑的事，成长感是我保持活力的核心。', pole:1 },
+  { d:'A', text:'我的书架上总有一半是还没读完的书——因为新的更让我兴奋。', pole:1 },
+  { d:'A', text:'我更愿意在秩序已建立后再加入，而不是从零开始搭建架构。', pole:-1 },
+  // ── 维度B：热情能量 · 火 (Passion, expression, intensity)
+  { d:'B', text:'我说话时习惯用手势和肢体语言，情绪状态会很明显地呈现出来。', pole:1 },
+  { d:'B', text:'聚会中我常常是带动气氛的人，我的能量会感染身边的人。', pole:1 },
+  { d:'B', text:'我做决定时更多依赖当下的直觉和热情，而非长时间的分析权衡。', pole:1 },
+  { d:'B', text:'有时候我会因为一件事太让我兴奋而忘记吃饭或睡觉。', pole:1 },
+  { d:'B', text:'我欣赏一切有强烈视觉冲击力和感官刺激的东西——艺术、音乐、城市夜景。', pole:1 },
+  { d:'B', text:'热闹的场合通常会让我感到精力被抽空，而不是被充满。', pole:-1 },
+  // ── 维度C：稳重深根 · 土 (Stability, nurturing, center)
+  { d:'C', text:'我喜欢长时间在同一个地方生活，熟悉的地方会给我深切的安全感。', pole:1 },
+  { d:'C', text:'朋友们经常向我倾诉，因为我能够耐心聆听而不急于给出建议。', pole:1 },
+  { d:'C', text:'比起刺激和冒险，我更享受一顿精心烹饪的家庭晚餐。', pole:1 },
+  { d:'C', text:'我认为关系的维系需要长期投入，我愿意为此付出时间和耐心。', pole:1 },
+  { d:'C', text:'我倾向于通过积累、沉淀来获得成就，而不是押注于一次爆发。', pole:1 },
+  { d:'C', text:'我觉得"家"只是一个睡觉的地方，更重要的是在外面发生的事情。', pole:-1 },
+  // ── 维度D：精准纯粹 · 金 (Precision, clarity, discipline)
+  { d:'D', text:'我对自己的工作有极高的标准，往往会反复修改直到真正满意为止。', pole:1 },
+  { d:'D', text:'混乱的环境会让我产生明显的不适感，整洁是我效率的前提。', pole:1 },
+  { d:'D', text:'我喜欢将复杂的事物梳理清楚，并给出简洁有力的结论。', pole:1 },
+  { d:'D', text:'我欣赏那些懂得取舍、做事干净利落的人，而不是四面出击的人。', pole:1 },
+  { d:'D', text:'在美学上，我偏爱极简主义和精工设计，而不是繁复的装饰。', pole:1 },
+  { d:'D', text:'我常常在工作到一半时就忍不住转向新的事情，规则和流程让我感到束缚。', pole:-1 },
+  // ── 维度E：流动内省 · 水 (Depth, introspection, adaptability)
+  { d:'E', text:'独处时我会思考很多，我的内心世界比大多数人看到的要丰富得多。', pole:1 },
+  { d:'E', text:'我能快速适应不同的环境和人，像水一样找到合适的位置。', pole:1 },
+  { d:'E', text:'比起行动，我更享受深思熟虑的过程，我做的决定通常经过了充分考量。', pole:1 },
+  { d:'E', text:'我对人性、历史和深层规律有持续的好奇心，喜欢探究事物背后的本质。', pole:1 },
+  { d:'E', text:'夜晚对我来说是最有创造力和思考深度的时间段。', pole:1 },
+  { d:'E', text:'我不喜欢太多的内省和反思，更愿意专注于眼前具体的事物和行动。', pole:-1 },
+];
+
+const DIM_META = {
+  A: { name:'生命律动', el:'木', color:'var(--wood-green)', dot:'#3d6b4f', label:'木 · 生发之气' },
+  B: { name:'热情能量', el:'火', color:'var(--fire-red)', dot:'#c1392b', label:'火 · 燃烧之气' },
+  C: { name:'稳重深根', el:'土', color:'var(--earth-yellow)', dot:'#b8860b', label:'土 · 承载之气' },
+  D: { name:'精准纯粹', el:'金', color:'var(--metal-white)', dot:'#c8c4bc', label:'金 · 收敛之气' },
+  E: { name:'流动内省', el:'水', color:'var(--water-blue)', dot:'#1e4d6b', label:'水 · 渗透之气' },
+};
+
+// 正式使用的34城市数据（修正版）
+const CITIES = [
+  // 直辖市4
+  {name:'北京',elProfile:{A:55,B:45,C:70,D:65,E:90},element:'水',elColor:'#2e7da8',elGlow:'rgba(46,125,168,0.4)',glyphType:'water',headline:'你的灵魂深邃而沉稳，善于在历史的厚度中寻找当下的坐标。北京是一座在时间中沉积的城市——故宫的城砖、胡同的炊烟，都在等待一个愿意慢慢读懂它的人。',natureDesc:'深度思考者，洞察历史规律与人性深层。内省力强，以长远眼光布局，是身边人的智识锚点，在复杂局面中保持沉稳。',careers:'学术研究、文化创意、战略咨询、政务管理、媒体传播、艺术策展',season:'冬·北方之气',colorSym:'玄黑',spots:['故宫博物院','南锣鼓巷','798艺术区','颐和园'],tags:['深沉','历史感','洞察力','厚重']},
+  {name:'上海',elProfile:{A:70,B:75,C:40,D:95,E:65},element:'金',elColor:'#b8a060',elGlow:'rgba(184,160,96,0.4)',glyphType:'metal',headline:'你的灵魂精准而现代，对品质有近乎苛刻的感知力。上海的国际化精度与摩登美学，是你内心秩序最自然的外化。浦东的玻璃幕墙折射出你看世界的方式。',natureDesc:'原则清晰，审美精准，追求极致品质。在混沌中能迅速找到秩序，决策果断，善于剔除冗余提炼核心。',careers:'金融投资、设计建筑、时尚品牌、法律咨询、高端零售、科技创业',season:'秋·西方之气',colorSym:'白银',spots:['外滩','新天地','M50创意园','豫园'],tags:['精准','国际化','效率','品质感']},
+  {name:'天津',elProfile:{A:55,B:75,C:65,D:55,E:45},element:'火+土',elColor:'#c17a3a',elGlow:'rgba(193,122,58,0.4)',glyphType:'fire',headline:'你有一种烟火气中的从容，热情而不张扬，幽默里藏着温度。天津是懂"过日子"的城市，相声与麻花，洋楼与海河，都是生活本身。',natureDesc:'性情坦率，幽默风趣，善于化解紧张气氛。重视人情味，在日常生活中寻找真实的快乐，不装不扭捏。',careers:'餐饮服务、文化演艺、传统手工艺、教育、商贸',season:'夏·南方之气',colorSym:'赤褐',spots:['五大道','古文化街','意式风情区','海河'],tags:['烟火气','幽默','亲和力','市井情']},
+  {name:'重庆',elProfile:{A:75,B:95,C:45,D:50,E:55},element:'火',elColor:'#c1392b',elGlow:'rgba(193,57,43,0.45)',glyphType:'fire',headline:'你的灵魂炽烈而有戏剧性，不甘平淡，充满感召力。重庆的立体江湖、山城夜火，是你内心烈焰最真实的镜像。',natureDesc:'热情如火，感召力强，直觉敏锐，是天然的焦点人物。能快速建立强烈的情感连接，行动力极强，敢冲敢拼。',careers:'餐饮创业、演艺娱乐、新媒体、市场营销、体验经济',season:'夏·南方之气',colorSym:'火红',spots:['洪崖洞','磁器口','解放碑','长江索道'],tags:['热烈','戏剧性','直觉力','感召力']},
+  // 东北3
+  {name:'哈尔滨',elProfile:{A:45,B:50,C:60,D:75,E:80},element:'水+金',elColor:'#5588aa',elGlow:'rgba(85,136,170,0.4)',glyphType:'water',headline:'你有一种清澈的孤独感，喜欢在宏大空间里独自思考。哈尔滨的冰雪世界与东欧建筑，是一种冷峻之美，与你灵魂的深度和克制相互呼应。',natureDesc:'思维深邃，喜欢独处与内省，有强烈的审美洁癖。对宏大叙事和深层规律有持续好奇，情感内敛而丰富。',careers:'艺术创作、文学写作、建筑设计、学术研究、音乐表演',season:'冬·北方之气',colorSym:'冰蓝',spots:['中央大街','冰雪大世界','圣索菲亚教堂','松花江'],tags:['冷峻之美','深度感','内省','孤独美学']},
+  {name:'长春',elProfile:{A:60,B:55,C:70,D:75,E:55},element:'金+土',elColor:'#8a9a6a',elGlow:'rgba(138,154,106,0.4)',glyphType:'metal',headline:'你稳健踏实，有长期主义的气质，不喜浮夸，追求可靠与专业。长春的工业精神与电影记忆，沉淀出东北特有的认真劲儿。',natureDesc:'做事严谨，重视专业能力，有强烈的责任感。对质量和标准有执念，是团队中最可靠的主心骨。',careers:'汽车工业、精密制造、电影传媒、农业科技、教育',season:'秋·西方之气',colorSym:'灰银',spots:['长春电影制片厂','伪满皇宫','净月潭','长春世界雕塑公园'],tags:['严谨','可靠','工业精神','踏实']},
+  {name:'沈阳',elProfile:{A:55,B:65,C:75,D:65,E:50},element:'土+金',elColor:'#9a7850',elGlow:'rgba(154,120,80,0.4)',glyphType:'earth',headline:'你骨子里有种盛京遗风——大气、厚道、不拘小节。沈阳是帝都的另一种注解，故宫与大帅府，是历史留给这座城市的底气。',natureDesc:'大气豪爽，重义气，有包容心。稳重而不失热情，是集体中的定海神针，能在复杂关系中维持平衡。',careers:'制造业、文旅开发、商贸物流、政务系统、传统文化',season:'季末18天·中央之气',colorSym:'黄褐',spots:['沈阳故宫','张氏帅府','方城','中街'],tags:['大气','厚道','历史感','豪爽']},
+  // 华北2
+  {name:'济南',elProfile:{A:50,B:55,C:85,D:60,E:60},element:'土',elColor:'#b8860b',elGlow:'rgba(184,134,11,0.4)',glyphType:'earth',headline:'你真诚务实，像趵突泉一样——清澈、恒定、从不标榜自己。济南的泉城气质与山东人的厚道，是你灵魂最真实的共鸣。',natureDesc:'真诚踏实，重情义，做事靠谱。不善于包装自己，但实力深厚。身边人的情绪稳定器，长期可信赖的存在。',careers:'农业科技、教育、传统制造、政务服务、医疗健康',season:'季末18天·中央之气',colorSym:'土黄',spots:['趵突泉','大明湖','千佛山','老商埠'],tags:['真诚','务实','稳重','厚道']},
+  {name:'石家庄',elProfile:{A:55,B:55,C:85,D:60,E:55},element:'土',elColor:'#907050',elGlow:'rgba(144,112,80,0.4)',glyphType:'earth',headline:'你踏实勤恳，是那种默默做事不求表扬的人。石家庄被戏称为"最没存在感的省会"，但正是这种低调，藏着最纯粹的实干精神。',natureDesc:'踏实勤恳，不需要他人认可，专注做好手头的事。有极强执行力，是团队中最可靠的执行者，不求出名但求实效。',careers:'制造业、医药、农业、物流、教育',season:'季末18天·中央之气',colorSym:'土褐',spots:['正定古城','西柏坡','赵州桥','封龙山'],tags:['低调实干','踏实','可靠','实干']},
+  // 华东6
+  {name:'南京',elProfile:{A:60,B:60,C:75,D:70,E:85},element:'水+土',elColor:'#4a6e8a',elGlow:'rgba(74,110,138,0.4)',glyphType:'water',headline:'你有一种悲悯的智慧，能感受到历史的重量。南京是一座有故事的城市，秦淮河的灯火背后是六朝金粉的深情与沧桑。',natureDesc:'情感深邃，富有人文关怀，善于在历史与现实间找到共鸣。洞察力强，有悲天悯人的底色，思考有深度。',careers:'人文学术、文化创意、历史研究、出版传媒、教育',season:'冬·北方之气',colorSym:'墨绿',spots:['中山陵','夫子庙','先锋书店','明城墙'],tags:['人文情怀','历史感','深度','悲悯']},
+  {name:'杭州',elProfile:{A:80,B:70,C:55,D:70,E:70},element:'木+水',elColor:'#3d7a5a',elGlow:'rgba(61,122,90,0.4)',glyphType:'wood',headline:'你兼具诗意与创造力，在传统与创新之间游刃有余。西湖的烟雨与阿里的代码，在杭州并不矛盾，而是共生，这正是你内心的写照。',natureDesc:'思维活跃，善于创新，有审美品位。能将传统文化与当代生活融合，对未来充满向往，同时尊重根脉。',careers:'互联网创业、电商、设计艺术、文化旅游、教育科技',season:'春·东方之气',colorSym:'青绿',spots:['西湖','灵隐寺','龙坞茶园','良渚古城'],tags:['诗意','创新','审美','兼容并包']},
+  {name:'合肥',elProfile:{A:65,B:55,C:55,D:85,E:75},element:'金+水',elColor:'#5a7090',elGlow:'rgba(90,112,144,0.4)',glyphType:'metal',headline:'你是低调的实力派，不爱张扬，但思维清晰，执行力强。合肥是中国最低调的崛起之城，用科技与实力说话，没有浮躁，只有专注。',natureDesc:'思维严密，低调务实，喜欢用数据和逻辑说话。对专业领域有深度钻研的耐心，不走捷径，稳步积累实力。',careers:'科研工程、人工智能、半导体、高校教育、战略规划',season:'秋·西方之气',colorSym:'银灰',spots:['科技馆','包公祠','巢湖','三河古镇'],tags:['低调实力','理性','专注','技术思维']},
+  {name:'福州',elProfile:{A:70,B:65,C:65,D:55,E:65},element:'木+火',elColor:'#5a8a5a',elGlow:'rgba(90,138,90,0.4)',glyphType:'wood',headline:'你热爱生活，有一种根植于大地的生命力，能在平凡中发现美。榕树的庇荫与海风的咸香，是福州给你灵魂最温柔的召唤。',natureDesc:'热情活跃，对生活充满热爱，善于经营人脉。有强烈的家族归属感，同时对外部世界充满好奇，内外兼顾。',careers:'海洋经济、对外贸易、传统食品、文旅、电商',season:'春·东方之气',colorSym:'榕绿',spots:['三坊七巷','鼓山','上下杭','西湖公园'],tags:['生命力','包容','烟火气','韧性']},
+  {name:'南昌',elProfile:{A:65,B:80,C:65,D:50,E:55},element:'火+木',elColor:'#c05030',elGlow:'rgba(192,80,48,0.4)',glyphType:'fire',headline:'你有种不服输的劲儿，性格直爽，敢想敢干。南昌是革命的摇篮，也是当代网红城市的黑马，不甘平庸的气质与你高度契合。',natureDesc:'性格直爽，有冲劲，不甘落后。情感浓烈，对认定的事情全力投入，是行动派的典型代表。',careers:'文创产业、红色旅游、制造业、新媒体、服务业',season:'夏·南方之气',colorSym:'赤红',spots:['滕王阁','八一广场','安义古村','鄱阳湖'],tags:['不服输','直爽','冲劲','行动力']},
+  // 华中3
+  {name:'武汉',elProfile:{A:70,B:80,C:55,D:60,E:75},element:'火+水',elColor:'#7a5090',elGlow:'rgba(122,80,144,0.4)',glyphType:'fire',headline:'你兼具热血与深度，既能在人群中点燃气氛，又有独自沉思的一面。武汉烈与智奇妙共存，九省通衢的格局与大学之城的智识，都是你的写照。',natureDesc:'热血与理智并存，行动力强，思维也有深度。善于在压力下爆发，有强烈的城市认同感和集体荣誉感。',careers:'教育科研、生物医药、互联网、文创、餐饮',season:'夏·南方之气',colorSym:'紫红',spots:['黄鹤楼','武汉大学','昙华林','东湖'],tags:['热血','深度','韧性','荣誉感']},
+  {name:'长沙',elProfile:{A:75,B:90,C:50,D:55,E:60},element:'火+木',elColor:'#c84030',elGlow:'rgba(200,64,48,0.4)',glyphType:'fire',headline:'你天生会玩，有极强的当下感知力。长沙是中国娱乐之都，茶颜悦色与热辣综艺，是这座城市热辣灵魂的缩影，也是你的写照。',natureDesc:'享乐主义者中的创造者，善于捕捉流行趋势，有极强的表达欲和娱乐精神。敢于出位，在快节奏中保持活力。',careers:'娱乐传媒、网红经济、餐饮创业、综艺制作、新媒体营销',season:'夏·南方之气',colorSym:'橘红',spots:['岳麓山','橘子洲','文和友','太平老街'],tags:['娱乐精神','创意','当下感','敢为人先']},
+  {name:'郑州',elProfile:{A:70,B:70,C:75,D:55,E:55},element:'土+火',elColor:'#b07040',elGlow:'rgba(176,112,64,0.4)',glyphType:'earth',headline:'你有中原人的务实与韧劲，在平凡中成就不平凡。郑州是火车拉来的城市，也是中华文明的腹地，这里的人从不喊口号，只用行动说话。',natureDesc:'务实行动派，有很强的生存能力和适应力。不靠背景靠实力，相信努力是最可靠的路径，有强烈的奋斗精神。',careers:'物流、制造业、互联网电商、建筑、农业科技',season:'季末18天·中央之气',colorSym:'土红',spots:['少林寺','嵩山','清明上河园','二七纪念塔'],tags:['务实','奋斗','韧性','中原气质']},
+  // 华南4
+  {name:'广州',elProfile:{A:70,B:75,C:70,D:60,E:55},element:'火+土',elColor:'#c06830',elGlow:'rgba(192,104,48,0.4)',glyphType:'fire',headline:'你务实重情，骨子里有种人间烟火的哲学——好好吃饭，好好生活。广州是中国最懂"人间值得"的城市，早茶是最真实的人生宣言。',natureDesc:'务实热情，重人情，善于在商业与生活之间找到平衡。有强烈的家庭观念，认为好好吃饭是最高的生活智慧。',careers:'餐饮食品、外贸商业、制造业、零售、文化传播',season:'夏·南方之气',colorSym:'橙黄',spots:['永庆坊','陈家祠','北京路','沙湾古镇'],tags:['务实','烟火气','包容','生活智慧']},
+  {name:'深圳',elProfile:{A:90,B:80,C:30,D:85,E:60},element:'木+金',elColor:'#3a8a7a',elGlow:'rgba(58,138,122,0.4)',glyphType:'wood',headline:'你是天生的创新者，相信明天一定比今天更好。深圳是中国最年轻的城市，没有历史包袱，只有无限可能，和你对未来的执念一样。',natureDesc:'创新驱动，行动力极强，对效率和结果有极高要求。不被传统束缚，相信技术和努力能改变一切，是进取主义者。',careers:'科技创业、互联网、半导体、金融科技、设计创意',season:'春·东方之气',colorSym:'科技蓝',spots:['深圳湾','南头古城','OCT创意文化园','大芬油画村'],tags:['创新','进取','效率','未来感']},
+  {name:'南宁',elProfile:{A:75,B:70,C:65,D:45,E:60},element:'木+火',elColor:'#3d8a50',elGlow:'rgba(61,138,80,0.4)',glyphType:'wood',headline:'你开朗自在，有一种热带植物的生命力——随时随地都能生根。南宁是绿城，壮族文化与东盟气息交融，温暖而多元。',natureDesc:'开朗随和，适应力强，善于与不同文化背景的人建立联系。热爱自然，有自由洒脱的生活态度，不拘一格。',careers:'东盟贸易、旅游业、农业、文化交流、教育',season:'春·东方之气',colorSym:'翠绿',spots:['青秀山','南宁老街','广西民族博物馆','花山岩画'],tags:['开朗','多元','自由','生命力']},
+  {name:'海口',elProfile:{A:70,B:80,C:50,D:45,E:65},element:'火+木',elColor:'#2a8a7a',elGlow:'rgba(42,138,122,0.4)',glyphType:'fire',headline:'你热爱自由，不喜欢被规则和框架束缚，向往阳光下的生活方式。海口是离自由最近的城市，蓝天、椰树、骑楼，是最真实的诗和远方。',natureDesc:'崇尚自由，热情开放，有很强的感官享乐力。不愿受约束，向往在阳光与自然中寻找生命的本质意义。',careers:'旅游度假、自由职业、海洋经济、电商、创意产业',season:'夏·南方之气',colorSym:'海蓝',spots:['骑楼老街','万绿园','东寨港红树林','火山口'],tags:['自由','阳光','开放','诗和远方']},
+  // 西南4
+  {name:'成都',elProfile:{A:80,B:70,C:75,D:50,E:65},element:'木+土',elColor:'#4a8a5a',elGlow:'rgba(74,138,90,0.4)',glyphType:'wood',headline:'你有一种慢节奏中的生命力——不慌不忙，却总在生长。成都最懂"悠然"，但悠然背后，是深厚的根与不断萌发的新芽。',natureDesc:'有生命热情，但不急不躁，懂得在慢中找到生长的节奏。善于享受当下，同时保持对未来的期待与布局，活得通透。',careers:'创意文化、餐饮、直播电商、游戏动漫、旅游、农业科技',season:'春·东方之气',colorSym:'青绿',spots:['宽窄巷子','武侯祠','青城山','都江堰'],tags:['悠然生机','包容','享乐','生长力']},
+  {name:'贵阳',elProfile:{A:70,B:60,C:65,D:50,E:75},element:'木+水',elColor:'#3a7055',elGlow:'rgba(58,112,85,0.4)',glyphType:'wood',headline:'你有一种远离喧嚣的清醒，喜欢在深山中看清世界。贵阳是大数据之都，也是山地之城，凉爽的气候和朴实的民风，藏着独特的智慧。',natureDesc:'思维独立，不随波逐流，喜欢在非主流的角落寻找真相。有强烈好奇心，对数据、规律和本质问题着迷。',careers:'大数据、云计算、生态旅游、民族文化、茶业',season:'春·东方之气',colorSym:'黛绿',spots:['青岩古镇','黔灵山','甲秀楼','花溪'],tags:['清醒','独立思考','山地智慧','好奇心']},
+  {name:'昆明',elProfile:{A:75,B:65,C:60,D:50,E:70},element:'木+水',elColor:'#4a9060',elGlow:'rgba(74,144,96,0.4)',glyphType:'wood',headline:'你有一颗永远年轻的心，对多元文化有天然的好奇和包容。昆明是春城，是去往西藏和东南亚的起点，是无数梦想出发的地方。',natureDesc:'开放多元，充满好奇心，有一种浪漫的流浪气质。善于与不同文化共鸣，在多样性中找到自己的坐标。',careers:'旅游文化、民族艺术、花卉产业、咖啡、探险旅行',season:'春·东方之气',colorSym:'彩虹色',spots:['翠湖公园','云南民族村','石林','滇池'],tags:['多元','永远年轻','浪漫','好奇心']},
+  {name:'拉萨',elProfile:{A:40,B:45,C:65,D:45,E:95},element:'水',elColor:'#3a6080',elGlow:'rgba(58,96,128,0.45)',glyphType:'water',headline:'你在寻找某种超越日常的意义，对灵魂的深度有近乎执着的渴望。拉萨不是目的地，是一种状态——在海拔四千米的地方，人终于可以安静地面对自己。',natureDesc:'灵性深厚，对精神世界有强烈追求。不被物质驱动，在宁静中感知世界的深层逻辑，有超然的平和感。',careers:'宗教文化、生态保护、民族艺术、冥想疗愈、高原科研',season:'冬·北方之气',colorSym:'佛蓝',spots:['布达拉宫','大昭寺','八廓街','纳木错'],tags:['灵性','超然','内省','寻找意义']},
+  // 西北5
+  {name:'西安',elProfile:{A:50,B:60,C:90,D:65,E:70},element:'土+水',elColor:'#9a7030',elGlow:'rgba(154,112,48,0.4)',glyphType:'earth',headline:'你有一种厚重的底气，根扎得深，不易动摇。西安是中华文明的原点，城墙之内的烟火与千年历史，共同构成你灵魂的土壤。',natureDesc:'稳重深厚，有强烈的历史感和根脉意识。值得信赖，不轻易改变，在长期积累中形成不可撼动的内核。',careers:'历史文博、考古、旅游、传统食品、教育、影视制作',season:'季末18天·中央之气',colorSym:'土黄',spots:['兵马俑','城墙','回民街','大唐不夜城'],tags:['厚重','根脉感','历史底蕴','稳定']},
+  {name:'兰州',elProfile:{A:55,B:55,C:80,D:55,E:65},element:'土+水',elColor:'#8a7050',elGlow:'rgba(138,112,80,0.4)',glyphType:'earth',headline:'你朴实无华，有黄河一样的韧劲——见过风沙，也见过星辰。兰州一碗牛肉面，藏着这座城市所有的底气与温情。',natureDesc:'朴实真诚，有极强的生活韧性。不追求表面光鲜，在平淡中积累真实的力量，对家乡和根有深厚的情感。',careers:'农业、文旅、能源、传统手工艺、物流',season:'季末18天·中央之气',colorSym:'黄褐',spots:['黄河风情线','白塔山','五泉山','中山桥'],tags:['朴实','韧性','黄河情怀','踏实']},
+  {name:'西宁',elProfile:{A:50,B:50,C:70,D:55,E:85},element:'水+土',elColor:'#3a7090',elGlow:'rgba(58,112,144,0.4)',glyphType:'water',headline:'你有一种高原上的清明——离天近，心更静。青海湖的湛蓝与塔尔寺的金黄，诉说着一种净化灵魂的宁静之美。',natureDesc:'内心清净，喜欢远离喧嚣，在大自然中找到精神平衡。思考深远，有超脱俗世的洒脱与淡然，不被俗务牵绊。',careers:'生态保护、宗教文化、旅游、高原科研、藏医',season:'冬·北方之气',colorSym:'湖蓝',spots:['青海湖','塔尔寺','茶卡盐湖','门源油菜花'],tags:['清净','高远','内心平静','净化灵魂']},
+  {name:'银川',elProfile:{A:55,B:60,C:80,D:55,E:65},element:'土+火',elColor:'#a87040',elGlow:'rgba(168,112,64,0.4)',glyphType:'earth',headline:'你有种塞外风情的豪迈，胸怀宽广，待人真诚。贺兰山的苍茫与黄河的温柔，交织出宽厚而热烈的性格底色。',natureDesc:'豪迈宽厚，重义气，有很强的包容力。在困难面前不轻易屈服，有塞北特有的粗犷与柔情兼备。',careers:'葡萄酒产业、旅游、农业、清真食品、文化传播',season:'季末18天·中央之气',colorSym:'金黄',spots:['西夏王陵','贺兰山岩画','沙湖','镇北堡影视城'],tags:['豪迈','宽厚','塞外风情','真诚']},
+  {name:'乌鲁木齐',elProfile:{A:75,B:70,C:60,D:50,E:75},element:'木+水',elColor:'#5a6a90',elGlow:'rgba(90,106,144,0.4)',glyphType:'wood',headline:'你有开拓者的气质，不畏遥远，向往边境之外的可能性。乌鲁木齐是丝路的起点，也是多元文化的熔炉，每一个方向都是新的远方。',natureDesc:'有探险家精神，对未知充满向往，适应力极强。在多元文化中如鱼得水，思维开阔，不被任何单一框架限制。',careers:'跨境贸易、旅游探险、能源、民族文化、农业',season:'春·东方之气',colorSym:'天山蓝',spots:['天山天池','国际大巴扎','南山牧场','喀纳斯'],tags:['开拓精神','多元','探险','边境气质']},
+  // 内蒙
+  {name:'呼和浩特',elProfile:{A:60,B:60,C:75,D:55,E:70},element:'土+水',elColor:'#6a8870',elGlow:'rgba(106,136,112,0.4)',glyphType:'earth',headline:'你有一种草原般的心胸——广阔、自由、不被边界定义。呼和浩特是草原文明与农耕文明的交汇点，那种辽阔感是你灵魂的底色。',natureDesc:'心胸宽广，有草原人的豪爽与包容。不被细节束缚，擅长从宏观角度看问题，对自然与自由有本能的向往。',careers:'牧业、旅游、乳业、民族文化、能源',season:'季末18天·中央之气',colorSym:'草绿',spots:['大召寺','内蒙古博物院','希拉穆仁草原','昭君博物院'],tags:['辽阔','草原气质','豪爽','自由']},
+  // 山西
+  {name:'太原',elProfile:{A:50,B:55,C:80,D:65,E:65},element:'土+金',elColor:'#8a7060',elGlow:'rgba(138,112,96,0.4)',glyphType:'earth',headline:'你有晋商的精明与厚道，既懂得积累，又知道什么时候该出手。太原是晋商的摇篮，兼顾长远与当下的智慧，是你天生的禀赋。',natureDesc:'精明而不失厚道，善于长期布局，重视诚信与传承。有极强的财富意识，但不投机取巧，靠实力积累。',careers:'金融、煤炭能源、传统制造、食品、文旅',season:'季末18天·中央之气',colorSym:'褐金',spots:['晋祠','平遥古城','乔家大院','壶口瀑布'],tags:['晋商智慧','精明厚道','长期主义','诚信']},
+];
+
+
+const ELEMENT_GLYPHS = {
+  wood: `<g stroke="#3d6b4f" stroke-width="2" fill="none" opacity="0.9">
+    <line x1="50" y1="90" x2="50" y2="20"/>
+    <line x1="50" y1="45" x2="25" y2="30"/>
+    <line x1="50" y1="45" x2="75" y2="30"/>
+    <line x1="50" y1="60" x2="20" y2="45"/>
+    <line x1="50" y1="60" x2="80" y2="45"/>
+    <circle cx="50" cy="20" r="5" fill="#6aaa7e" stroke="none"/>
+    <path d="M35 90 Q50 82 65 90" stroke="#3d6b4f"/>
+  </g>`,
+  fire: `<g stroke="#c1392b" stroke-width="1.5" fill="none" opacity="0.9">
+    <path d="M50 85 Q35 65 45 45 Q50 35 50 20 Q60 35 55 50 Q70 40 65 60 Q80 50 70 70 Q65 80 50 85 Z" stroke="#c1392b" stroke-width="1.5"/>
+    <path d="M50 75 Q42 60 48 48 Q50 42 50 32 Q56 42 53 52 Q62 46 59 58 Q66 54 61 64 Q58 70 50 75 Z" fill="rgba(193,57,43,0.3)" stroke="none"/>
+  </g>`,
+  earth: `<g stroke="#b8860b" stroke-width="2" fill="none" opacity="0.9">
+    <rect x="20" y="55" width="60" height="8" rx="2" stroke="#b8860b" fill="rgba(184,134,11,0.2)"/>
+    <line x1="50" y1="20" x2="50" y2="55"/>
+    <line x1="28" y1="35" x2="72" y2="35"/>
+    <line x1="20" y1="63" x2="20" y2="85"/>
+    <line x1="80" y1="63" x2="80" y2="85"/>
+    <line x1="15" y1="85" x2="85" y2="85"/>
+    <circle cx="50" cy="18" r="4" fill="#d4a017" stroke="none"/>
+  </g>`,
+  metal: `<g stroke="#c8c4bc" stroke-width="1.5" fill="none" opacity="0.9">
+    <polygon points="50,15 85,65 50,88 15,65" stroke="#c8c4bc" stroke-width="1.5" fill="rgba(200,196,188,0.08)"/>
+    <polygon points="50,28 75,65 50,78 25,65" stroke="#c8c4bc" stroke-width="0.8" fill="rgba(200,196,188,0.06)"/>
+    <line x1="50" y1="15" x2="50" y2="88"/>
+    <line x1="15" y1="65" x2="85" y2="65"/>
+  </g>`,
+  water: `<g stroke="#1e4d6b" stroke-width="1.5" fill="none" opacity="0.9">
+    <path d="M20 35 Q30 20 40 35 Q50 50 60 35 Q70 20 80 35" stroke="#2e7da8" stroke-width="2"/>
+    <path d="M15 55 Q27.5 38 40 55 Q52.5 72 65 55 Q77.5 38 85 55" stroke="#2e7da8" stroke-width="2"/>
+    <path d="M20 75 Q30 60 40 75 Q50 90 60 75 Q70 60 80 75" stroke="#1e4d6b" stroke-width="1.5"/>
+    <ellipse cx="50" cy="20" rx="15" ry="6" fill="rgba(46,125,168,0.2)" stroke="#2e7da8" stroke-width="1"/>
+  </g>`,
+};
+
+/* ══ STATE ══ */
+let currentQ = 0;
+let answers = new Array(QUESTIONS.length).fill(undefined);
+
+/* ══ STARS ══ */
+function createStars() {
+  const c = document.getElementById('stars');
+  for (let i = 0; i < 80; i++) {
+    const s = document.createElement('div');
+    s.className = 'star';
+    const size = Math.random() * 2 + 0.5;
+    s.style.cssText = `
+      left:${Math.random()*100}%;top:${Math.random()*100}%;
+      width:${size}px;height:${size}px;
+      --d:${(Math.random()*4+2).toFixed(1)}s;
+      --delay:${(Math.random()*4).toFixed(1)}s;
+      --min-op:${(Math.random()*0.1+0.05).toFixed(2)};
+      --max-op:${(Math.random()*0.4+0.3).toFixed(2)};
+    `;
+    c.appendChild(s);
+  }
+}
+
+/* ══ SCREEN ══ */
+function showScreen(id) {
+  document.querySelectorAll('.screen').forEach(s => {
+    s.classList.remove('active');
+    s.classList.add('hidden');
+  });
+  const el = document.getElementById(id);
+  el.classList.remove('hidden');
+  requestAnimationFrame(() => {
+    requestAnimationFrame(() => { el.classList.add('active'); });
+  });
+}
+
+/* ══ START ══ */
+function startTest() {
+  currentQ = 0;
+  answers.fill(undefined);
+  renderQuestion();
+  showScreen('quiz-screen');
+}
+
+/* ══ RENDER QUESTION ══ */
+function renderQuestion() {
+  const q = QUESTIONS[currentQ];
+  const meta = DIM_META[q.d];
+  const total = QUESTIONS.length;
+  
+  document.getElementById('cur-q').textContent = currentQ + 1;
+  document.getElementById('prog-fill').style.width = `${(currentQ / total) * 100}%`;
+  document.getElementById('q-num').textContent = `QUESTION ${String(currentQ+1).padStart(2,'0')} · ${meta.name.toUpperCase()}`;
+  document.getElementById('q-text').textContent = q.text;
+  
+  // dim indicator
+  document.getElementById('dim-dot').style.background = meta.dot;
+  document.getElementById('dim-label').textContent = meta.label;
+  
+  // card accent color
+  const colorMap = { A:'#3d6b4f', B:'#c1392b', C:'#b8860b', D:'#c8c4bc', E:'#1e4d6b' };
+  document.getElementById('q-card').style.setProperty('--current-element-color', colorMap[q.d]);
+  
+  // restore selection
+  const val = answers[currentQ];
+  document.querySelectorAll('.lk-cell').forEach(cell => {
+    cell.className = 'lk-cell';
+    if (val !== undefined && parseInt(cell.dataset.val) === val) {
+      cell.classList.add(`sel-${val}`);
+    }
+  });
+  
+  // nav buttons
+  document.getElementById('btn-prev').disabled = currentQ === 0;
+  document.getElementById('btn-next').style.display = currentQ < total - 1 ? '' : 'none';
+  const submitBtn = document.getElementById('btn-submit');
+  if (currentQ === total - 1) {
+    submitBtn.classList.add('show');
+    document.getElementById('btn-next').style.display = 'none';
+  } else {
+    submitBtn.classList.remove('show');
+  }
+}
+
+function selectAnswer(val) {
+  answers[currentQ] = val;
+  document.querySelectorAll('.lk-cell').forEach(cell => {
+    cell.className = 'lk-cell';
+    if (parseInt(cell.dataset.val) === val) cell.classList.add(`sel-${val}`);
+  });
+  // auto advance
+  if (currentQ < QUESTIONS.length - 1) {
+    setTimeout(() => goTo(currentQ + 1), 320);
+  }
+}
+
+function goTo(idx) {
+  if (idx < 0 || idx >= QUESTIONS.length) return;
+  const card = document.getElementById('q-card');
+  const forward = idx > currentQ;
+  card.classList.add(forward ? 'slide-out-left' : 'slide-out-right');
+  setTimeout(() => {
+    card.classList.remove('slide-out-left','slide-out-right');
+    currentQ = idx;
+    renderQuestion();
+    card.classList.add(forward ? 'slide-in-right' : 'slide-in-left');
+    setTimeout(() => card.classList.remove('slide-in-right','slide-in-left'), 300);
+  }, 260);
+}
+
+function trySubmit() {
+  const unanswered = answers.map((a,i) => i).filter(i => answers[i] === undefined);
+  if (unanswered.length > 0) {
+    const grid = document.getElementById('modal-grid');
+    grid.innerHTML = unanswered.map(i => `<button class="unanswered-btn" onclick="jumpTo(${i})">第 ${i+1} 题</button>`).join('');
+    document.getElementById('modal').classList.add('open');
+    return;
+  }
+  calculate();
+}
+
+function jumpTo(i) { closeModal(); goTo(i); }
+function closeModal() { document.getElementById('modal').classList.remove('open'); }
+
+/* ══ CALCULATE ══ */
+function calculate() {
+  showScreen('calc-screen');
+  const calcMsgs = [
+    '正在感知天地气运 · · ·',
+    '推演五行能量分布 · · ·',
+    '比对三十四座城市 · · ·',
+    '命格归城，天机已现 · · ·',
+  ];
+  let msgIdx = 0;
+  const msgEl = document.getElementById('calc-text');
+  const msgInterval = setInterval(() => {
+    msgIdx = (msgIdx + 1) % calcMsgs.length;
+    if (msgEl) { msgEl.style.opacity=0; setTimeout(()=>{ msgEl.textContent=calcMsgs[msgIdx]; msgEl.style.opacity=1; },300); }
+  }, 600);
+
+  setTimeout(() => {
+    clearInterval(msgInterval);
+    const scores = { A:0, B:0, C:0, D:0, E:0 };
+    QUESTIONS.forEach((q, i) => {
+      const val = answers[i];
+      if (val === undefined) return;
+      const raw = -(val - 3); // 1→+2, 3→0, 5→-2
+      scores[q.d] += raw * q.pole;
+    });
+    const maxPerDim = 6 * 2;
+    const normalized = {};
+    Object.keys(scores).forEach(k => {
+      normalized[k] = Math.round(((scores[k] + maxPerDim) / (2 * maxPerDim)) * 100);
+    });
+    const dims = ['A','B','C','D','E'];
+
+    // Cosine similarity vs each city
+    const ranked = CITIES.map(city => {
+      let dot=0, magU=0, magC=0;
+      dims.forEach(d => {
+        const u = normalized[d], c = city.elProfile[d];
+        dot += u*c; magU += u*u; magC += c*c;
+      });
+      const sim = dot / (Math.sqrt(magU)*Math.sqrt(magC) + 1e-9);
+      return { city, sim };
+    }).sort((a,b) => b.sim - a.sim);
+
+    // Convert to percentage (top=100%)
+    const topSim = ranked[0].sim;
+    const top3 = ranked.slice(0,3).map(r => ({
+      ...r.city,
+      simPct: Math.round((r.sim / topSim) * 100)
+    }));
+
+    showResult(top3[0], normalized, top3);
+  }, 2400);
+}
+
+/* ══ SHOW RESULT ══ */
+function showResult(city, normalized, top3) {
+  document.documentElement.style.setProperty('--el-color', city.elColor);
+  document.documentElement.style.setProperty('--el-glow', city.elGlow);
+
+  // Hero
+  document.getElementById('result-glyph').innerHTML = ELEMENT_GLYPHS[city.glyphType];
+  document.getElementById('result-el-name').textContent = city.element;
+  document.getElementById('result-el-name').style.color = city.elColor;
+  document.getElementById('result-city-name').textContent = city.name;
+  document.getElementById('result-city-sub').textContent = city.province + ' · ' + city.season;
+  document.getElementById('result-headline').textContent = city.headline;
+
+  // Top 3 row
+  const rankLabels = ['命格主城', '次择之地', '三合之城'];
+  const rankClasses = ['rank-1', 'rank-2', 'rank-3'];
+  document.getElementById('top3-row').innerHTML = top3.map((c, i) => `
+    <div class="top3-card ${rankClasses[i]}">
+      <div class="top3-rank ${i===0?'rank-gold':''}">${rankLabels[i]}</div>
+      <div class="top3-city-name" style="${i===0?'color:'+c.elColor:''}">${c.name}</div>
+      <div class="top3-el">${c.element} · ${c.province}</div>
+      <div class="top3-pct-bar">
+        <div class="top3-pct-fill" style="background:${c.elColor};width:0%" data-target="${c.simPct}%"></div>
+      </div>
+      <div class="top3-pct-num" style="color:${c.elColor}">${c.simPct}% 契合</div>
+    </div>
+  `).join('');
+
+  // Pentagon bars
+  const elMap = {A:'木',B:'火',C:'土',D:'金',E:'水'};
+  const colorMap = {
+    A:{bar:'el-wood-bar',text:'#3d6b4f'},B:{bar:'el-fire-bar',text:'#c1392b'},
+    C:{bar:'el-earth-bar',text:'#b8860b'},D:{bar:'el-metal-bar',text:'#c8c4bc'},
+    E:{bar:'el-water-bar',text:'#2e7da8'},
+  };
+  document.getElementById('pentagon-bars').innerHTML = Object.keys(normalized).map(k => `
+    <div class="p-bar-row">
+      <div class="p-bar-label" style="color:${colorMap[k].text}">${elMap[k]}</div>
+      <div class="p-bar-track">
+        <div class="p-bar-fill ${colorMap[k].bar}" style="width:0%" data-target="${normalized[k]}%"></div>
+      </div>
+      <div class="p-bar-pct" style="color:${colorMap[k].text}">${normalized[k]}%</div>
+    </div>
+  `).join('');
+
+  // Grid 1 — soul description
+  document.getElementById('result-grid-1').innerHTML = `
+    <div class="r-card">
+      <div class="r-card-eyebrow">SOUL NATURE · 命元气质</div>
+      <div class="r-card-title">你是怎样的人</div>
+      <div class="r-card-body">${city.natureDesc}</div>
+    </div>
+    <div class="r-card">
+      <div class="r-card-eyebrow">ELEMENT INFO · 五行归属</div>
+      <div class="r-card-title">命格信息</div>
+      <div class="r-card-body">
+        <strong>主元素</strong> · ${city.element}<br>
+        <strong>本命时节</strong> · ${city.season}<br>
+        <strong>本命色系</strong> · ${city.colorSym}
+      </div>
+      <div class="trait-chips" style="margin-top:18px;">
+        ${city.tags.map(t=>`<div class="trait-chip" style="border-color:${city.elColor}50;color:${city.elColor};">${t}</div>`).join('')}
+      </div>
+    </div>
+  `;
+
+  // Grid 2 — must visit spots
+  document.getElementById('result-grid-2').innerHTML = `
+    <div class="r-card" style="border-color:${city.elColor}28;">
+      <div class="r-card-eyebrow">MUST-VISIT · 命中注定要去的地方</div>
+      <div class="r-card-title" style="font-size:24px;color:${city.elColor};">${city.name} · 你与它的约定</div>
+      <div class="r-card-body" style="margin-bottom:0;">${city.headline}</div>
+      <div class="spots-grid">
+        ${city.spots.map(s=>`
+          <div class="spot-item" style="--el-color:${city.elColor}">
+            <div class="spot-name">${s}</div>
+          </div>
+        `).join('')}
+      </div>
+    </div>
+  `;
+
+  // Grid 3 — career + similar cities
+  const similarCities = top3.slice(1).map(c => `<span style="color:${c.elColor}">${c.name}</span>`).join('、');
+  document.getElementById('result-grid-3').innerHTML = `
+    <div class="r-card">
+      <div class="r-card-eyebrow">CAREER · 命格事业方向</div>
+      <div class="r-card-title">最适合你的领域</div>
+      <div class="r-card-body">${city.careers}</div>
+    </div>
+    <div class="r-card">
+      <div class="r-card-eyebrow">RESONANCE · 气场相近的城市</div>
+      <div class="r-card-title">你也可以考虑</div>
+      <div class="r-card-body">
+        除${city.name}外，你的五行气场与 ${similarCities} 也有较高的共鸣。<br><br>
+        这些城市与你的气质有不同维度的契合，值得你去探索和感知。
+      </div>
+    </div>
+  `;
+
+  showScreen('result-screen');
+
+  // Animate bars after paint
+  setTimeout(() => {
+    document.querySelectorAll('.p-bar-fill, .top3-pct-fill').forEach(bar => {
+      bar.style.width = bar.dataset.target;
+    });
+  }, 500);
+}
+
+
+function restartTest() {
+  document.documentElement.style.removeProperty('--el-color');
+  document.documentElement.style.removeProperty('--el-glow');
+  showScreen('intro-screen');
+}
+
+/* ══ INIT ══ */
+window.addEventListener('load', () => {
+  createStars();
+  const loading = document.getElementById('loading');
+  setTimeout(() => {
+    loading.classList.add('fade-out');
+    setTimeout(() => {
+      loading.style.display = 'none';
+      showScreen('intro-screen');
+    }, 800);
+  }, 1400);
+});
+</script>
+</body>
+</html>
