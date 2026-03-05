@@ -728,6 +728,172 @@ h1.main-title {
   .result-hero { padding: 48px 20px 40px; }
   .spots-grid { grid-template-columns: 1fr; }
 }
+
+/* ══ BAZI SCREEN ══ */
+.bazi-wrap {
+  width: 100%; max-width: 680px;
+  display: flex; flex-direction: column; align-items: center;
+}
+.bazi-inputs-card {
+  width: 100%;
+  background: linear-gradient(145deg, rgba(24,22,32,0.92), rgba(18,16,26,0.96));
+  border: 1px solid rgba(201,168,76,0.22);
+  padding: 40px 36px 32px;
+  margin-bottom: 24px;
+  backdrop-filter: blur(16px);
+  box-shadow: 0 12px 60px rgba(0,0,0,0.5);
+  position: relative;
+}
+.bazi-inputs-card::before {
+  content: '';
+  position: absolute; top: 0; left: 0; right: 0; height: 2px;
+  background: linear-gradient(90deg, transparent, var(--gold), transparent);
+  opacity: 0.7;
+}
+.bazi-row {
+  display: grid; grid-template-columns: 1fr 1fr 1fr 1fr;
+  gap: 16px; margin-bottom: 28px;
+}
+.bazi-field { display: flex; flex-direction: column; gap: 8px; }
+.bazi-field-label {
+  font-size: 9px; letter-spacing: 0.45em; color: var(--gold); opacity: 0.7;
+  text-align: center;
+}
+.bazi-input, .bazi-select {
+  font-family: 'Noto Serif SC', serif;
+  font-size: 14px; color: var(--bright);
+  background: rgba(255,255,255,0.04);
+  border: 1px solid rgba(201,168,76,0.2);
+  padding: 12px 10px;
+  text-align: center;
+  outline: none;
+  transition: border-color 0.25s, background 0.25s;
+  width: 100%;
+  -webkit-appearance: none; appearance: none;
+  cursor: pointer;
+}
+.bazi-input:focus, .bazi-select:focus {
+  border-color: var(--gold);
+  background: rgba(201,168,76,0.06);
+}
+.bazi-input::placeholder { color: rgba(224,218,205,0.25); }
+.bazi-select option { background: #1a1828; color: var(--bright); }
+.bazi-unknown-row {
+  display: flex; align-items: center; gap: 10px; margin-bottom: 20px;
+  padding: 10px 12px;
+  border: 1px solid rgba(201,168,76,0.1);
+  background: rgba(255,255,255,0.02);
+}
+.bazi-checkbox {
+  width: 14px; height: 14px; accent-color: var(--gold); cursor: pointer;
+}
+.bazi-unknown-label {
+  font-size: 11px; color: var(--dim-text); letter-spacing: 0.1em; cursor: pointer;
+}
+.bazi-note {
+  font-size: 11px; color: var(--dim-text); letter-spacing: 0.1em;
+  text-align: center; margin-bottom: 0; line-height: 1.8;
+}
+
+/* Pillars preview */
+.pillars-preview {
+  width: 100%; margin-top: 4px;
+  display: none;
+}
+.pillars-preview.show { display: block; }
+.pillars-title {
+  font-size: 9px; letter-spacing: 0.5em; color: var(--gold); opacity: 0.6;
+  text-align: center; margin-bottom: 16px;
+}
+.pillars-row {
+  display: grid; grid-template-columns: repeat(4, 1fr);
+  gap: 10px; margin-bottom: 16px;
+}
+.pillar-card {
+  background: rgba(201,168,76,0.04);
+  border: 1px solid rgba(201,168,76,0.15);
+  padding: 14px 8px;
+  text-align: center;
+  position: relative;
+}
+.pillar-label {
+  font-size: 8px; letter-spacing: 0.35em; color: var(--dim-text);
+  margin-bottom: 10px;
+}
+.pillar-chars {
+  display: flex; flex-direction: column; align-items: center; gap: 6px;
+}
+.pillar-stem {
+  font-family: 'Ma Shan Zheng', cursive;
+  font-size: 26px; line-height: 1;
+  text-shadow: 0 0 20px currentColor;
+}
+.pillar-branch {
+  font-family: 'Ma Shan Zheng', cursive;
+  font-size: 26px; line-height: 1;
+  text-shadow: 0 0 20px currentColor;
+}
+.pillar-el-tag {
+  font-size: 9px; margin-top: 4px;
+  opacity: 0.65; letter-spacing: 0.1em;
+}
+
+/* Bazi five-element mini bars */
+.bazi-el-bars {
+  display: flex; flex-direction: column; gap: 8px;
+  margin-top: 14px;
+}
+.bazi-el-row {
+  display: grid; grid-template-columns: 28px 1fr 38px;
+  align-items: center; gap: 10px;
+}
+.bazi-el-name {
+  font-family: 'Ma Shan Zheng', cursive; font-size: 14px; text-align: right;
+}
+.bazi-el-track { height: 4px; background: rgba(255,255,255,0.06); }
+.bazi-el-fill { height: 100%; transition: width 0.9s cubic-bezier(0.16,1,0.3,1); }
+.bazi-el-pct { font-size: 10px; opacity: 0.7; text-align: right; }
+
+.btn-bazi-confirm {
+  font-family: 'Noto Serif SC', serif;
+  font-size: 13px; letter-spacing: 0.3em;
+  color: #0c0e14;
+  background: linear-gradient(135deg, #dab850, #b88828, #dab850);
+  background-size: 200% 100%;
+  border: none; padding: 18px 52px; cursor: pointer;
+  transition: all 0.35s ease;
+  clip-path: polygon(10px 0%, 100% 0%, calc(100% - 10px) 100%, 0% 100%);
+  box-shadow: 0 4px 32px rgba(201,168,76,0.2);
+  animation: btn-shimmer 3s ease-in-out infinite;
+  margin-top: 8px;
+}
+.btn-bazi-confirm:hover {
+  transform: translateY(-3px);
+  box-shadow: 0 12px 40px rgba(201,168,76,0.32);
+}
+.btn-back-intro {
+  font-family: 'Noto Serif SC', serif;
+  font-size: 10px; letter-spacing: 0.3em; color: var(--dim-text);
+  background: transparent; border: none; cursor: pointer;
+  margin-top: 18px; padding: 6px 0;
+  transition: color 0.25s;
+}
+.btn-back-intro:hover { color: var(--gold); }
+
+/* bazi contribution badge in result */
+.bazi-source-tag {
+  display: inline-flex; align-items: center; gap: 6px;
+  font-size: 9px; letter-spacing: 0.3em; color: var(--gold);
+  border: 1px solid rgba(201,168,76,0.25); padding: 4px 10px;
+  opacity: 0.75; margin-bottom: 16px;
+}
+
+@media (max-width: 600px) {
+  .bazi-row { grid-template-columns: 1fr 1fr; gap: 12px; }
+  .pillars-row { grid-template-columns: repeat(4,1fr); gap: 6px; }
+  .pillar-stem, .pillar-branch { font-size: 20px; }
+  .bazi-inputs-card { padding: 28px 16px 22px; }
+}
 </style>
 </head>
 <body>
@@ -809,7 +975,7 @@ h1.main-title {
     从<strong>生命律动、空间感知、时间偏好、情绪质感、决策模式</strong>五个维度，<br>
     为你推算最契合灵魂的中国城市。
   </p>
-  <div class="intro-note">每题采用五级量表 · 请依第一直觉作答 · 无需过度思虑</div>
+  <div class="intro-note">第一步：输入出生年月日时，排定本命八字 · 第二步：作答30道行为倾向题目</div>
   
   <div class="elements-strip">
     <div class="el-badge el-wood">木</div>
@@ -820,6 +986,90 @@ h1.main-title {
   </div>
   
   <button class="btn-start" onclick="startTest()">叩问天机</button>
+</div>
+
+<!-- ══════════ BAZI INPUT ══════════ -->
+<div class="screen hidden" id="bazi-screen">
+  <div class="bazi-wrap">
+    <div class="eyebrow">本命推算 · 第一步</div>
+    <h2 style="font-family:'Ma Shan Zheng',cursive;font-size:clamp(32px,6vw,52px);color:var(--bright);letter-spacing:0.2em;margin-bottom:8px;font-weight:400;">排定八字</h2>
+    <p style="font-size:13px;color:var(--mid-text);letter-spacing:0.08em;text-align:center;margin-bottom:32px;line-height:2;">
+      八字由出生年、月、日、时的天干地支组成，<br>
+      其中藏有你与生俱来的五行能量格局，<br>
+      将作为命格测算的先天依据（权重30%）。
+    </p>
+
+    <div class="bazi-inputs-card">
+      <div class="bazi-row">
+        <div class="bazi-field">
+          <div class="bazi-field-label">出生年份</div>
+          <input class="bazi-input" type="number" id="bazi-year" placeholder="1990" min="1900" max="2010" oninput="onBaziInput()">
+        </div>
+        <div class="bazi-field">
+          <div class="bazi-field-label">出生月份</div>
+          <select class="bazi-select" id="bazi-month" onchange="onBaziInput()">
+            <option value="">选月份</option>
+            <option value="1">一月 · 丑</option>
+            <option value="2">二月 · 寅</option>
+            <option value="3">三月 · 卯</option>
+            <option value="4">四月 · 辰</option>
+            <option value="5">五月 · 巳</option>
+            <option value="6">六月 · 午</option>
+            <option value="7">七月 · 未</option>
+            <option value="8">八月 · 申</option>
+            <option value="9">九月 · 酉</option>
+            <option value="10">十月 · 戌</option>
+            <option value="11">十一月 · 亥</option>
+            <option value="12">十二月 · 子</option>
+          </select>
+        </div>
+        <div class="bazi-field">
+          <div class="bazi-field-label">出生日期</div>
+          <input class="bazi-input" type="number" id="bazi-day" placeholder="15" min="1" max="31" oninput="onBaziInput()">
+        </div>
+        <div class="bazi-field">
+          <div class="bazi-field-label">出生时辰</div>
+          <select class="bazi-select" id="bazi-hour" onchange="onBaziInput()">
+            <option value="">选时辰</option>
+            <option value="0">子时 · 23–01时</option>
+            <option value="2">丑时 · 01–03时</option>
+            <option value="4">寅时 · 03–05时</option>
+            <option value="6">卯时 · 05–07时</option>
+            <option value="8">辰时 · 07–09时</option>
+            <option value="10">巳时 · 09–11时</option>
+            <option value="12">午时 · 11–13时</option>
+            <option value="14">未时 · 13–15时</option>
+            <option value="16">申时 · 15–17时</option>
+            <option value="18">酉时 · 17–19时</option>
+            <option value="20">戌时 · 19–21时</option>
+            <option value="22">亥时 · 21–23时</option>
+          </select>
+        </div>
+      </div>
+
+      <label class="bazi-unknown-row">
+        <input type="checkbox" class="bazi-checkbox" id="bazi-unknown-hour" onchange="onBaziInput()">
+        <span class="bazi-unknown-label">不知道出生时辰（仅推算年月日三柱，时柱留空）</span>
+      </label>
+
+      <!-- Pillars Preview -->
+      <div class="pillars-preview" id="pillars-preview">
+        <div class="divider" style="margin-bottom:20px;margin-top:4px;">
+          <div class="divider-line"></div>
+          <div class="divider-trigram" style="font-size:12px;">八字已定</div>
+          <div class="divider-line"></div>
+        </div>
+        <div class="pillars-title">四柱八字 · 天干在上 · 地支在下</div>
+        <div class="pillars-row" id="pillars-row"></div>
+        <div class="bazi-el-bars" id="bazi-el-bars"></div>
+      </div>
+
+      <div class="bazi-note" id="bazi-note">请填写出生年、月、日后自动推算</div>
+    </div>
+
+    <button class="btn-bazi-confirm" id="btn-bazi-confirm" onclick="confirmBazi()" style="display:none;">八字已定 · 开始测算 →</button>
+    <button class="btn-back-intro" onclick="showScreen('intro-screen')">← 返回</button>
+  </div>
 </div>
 
 <!-- ══════════ QUIZ ══════════ -->
@@ -917,6 +1167,10 @@ h1.main-title {
   <!-- PENTAGON BARS -->
   <div class="pentagon-wrap">
     <div class="pentagon-title">五行能量分布 · FIVE ELEMENTS DISTRIBUTION</div>
+    <div id="bazi-source-info" style="display:none;text-align:center;margin-bottom:16px;">
+      <div class="bazi-source-tag">✦ 已融合八字本命五行 · 先天30% + 后天70%</div>
+      <div id="bazi-pillars-mini" style="font-family:'Ma Shan Zheng',cursive;font-size:18px;letter-spacing:0.3em;color:var(--gold);opacity:0.7;"></div>
+    </div>
     <div class="pentagon-bars" id="pentagon-bars"></div>
   </div>
   
@@ -1111,6 +1365,176 @@ function showScreen(id) {
 
 /* ══ START ══ */
 function startTest() {
+  showScreen('bazi-screen');
+}
+
+/* ══════════════════════════════════════
+   BAZI (八字) ENGINE
+   ══════════════════════════════════════ */
+
+const STEMS   = ['甲','乙','丙','丁','戊','己','庚','辛','壬','癸'];
+const BRANCHES = ['子','丑','寅','卯','辰','巳','午','未','申','酉','戌','亥'];
+
+// Five-element dimension mapping for stems (index 0-9)
+const STEM_DIM   = ['A','A','B','B','C','C','D','D','E','E'];
+// Five-element dimension mapping for branches (index 0-11)
+const BRANCH_DIM = ['E','C','A','A','C','B','B','C','D','D','C','E'];
+
+// Colors for each dimension
+const DIM_COLOR = { A:'#6aaa7e', B:'#e8614f', C:'#d4a017', D:'#e8e4dc', E:'#2e7da8' };
+const DIM_NAME  = { A:'木', B:'火', C:'土', D:'金', E:'水' };
+
+// Compute Julian Day Number (Gregorian)
+function toJDN(year, month, day) {
+  const a = Math.floor((14 - month) / 12);
+  const y = year + 4800 - a;
+  const m = month + 12 * a - 3;
+  return day + Math.floor((153 * m + 2) / 5) + 365 * y +
+         Math.floor(y / 4) - Math.floor(y / 100) + Math.floor(y / 400) - 32045;
+}
+
+function calcBazi(year, month, day, hour) {
+  // ── Year pillar ──
+  const yearStemIdx   = ((year - 4) % 10 + 10) % 10;
+  const yearBranchIdx = ((year - 4) % 12 + 12) % 12;
+
+  // ── Month pillar ──
+  // Branch follows solar calendar month
+  const monthBranchMap = [1,2,3,4,5,6,7,8,9,10,11,0]; // Jan→丑(1)…Dec→子(0)
+  const monthBranchIdx = monthBranchMap[month - 1];
+  // Stem: base for 寅 month depends on year stem
+  const monthBases = [2,4,6,8,0]; // 甲己→丙, 乙庚→戊, 丙辛→庚, 丁壬→壬, 戊癸→甲
+  const monthOrder = [1,2,3,4,5,6,7,8,9,10,11,0]; // branch order from 丑=Jan to 子=Dec
+  const monthPos = monthOrder.indexOf(monthBranchIdx);
+  const monthStemIdx = (monthBases[yearStemIdx % 5] + monthPos * 2) % 10;
+
+  // ── Day pillar ──
+  const jdn = toJDN(year, month, day);
+  // Reference: JDN 2415021 = Jan 1, 1900 = 甲戌 (stem=0, branch=10)
+  const dayStemIdx   = ((jdn + 9) % 10 + 10) % 10;
+  const dayBranchIdx = ((jdn + 1) % 12 + 12) % 12;
+
+  // ── Hour pillar ──
+  let hourStemIdx = null, hourBranchIdx = null;
+  if (hour !== null) {
+    hourBranchIdx = Math.floor((hour + 1) / 2) % 12;
+    const hourBases = [0,2,4,6,8]; // 甲己日→子时甲, 乙庚日→子时丙 …
+    hourStemIdx = (hourBases[dayStemIdx % 5] + hourBranchIdx * 2) % 10;
+  }
+
+  return [
+    { label:'年柱', stem: yearStemIdx,  branch: yearBranchIdx  },
+    { label:'月柱', stem: monthStemIdx, branch: monthBranchIdx },
+    { label:'日柱', stem: dayStemIdx,   branch: dayBranchIdx   },
+    { label:'时柱', stem: hourStemIdx,  branch: hourBranchIdx  },
+  ];
+}
+
+function baziToElements(pillars) {
+  const counts = { A:0, B:0, C:0, D:0, E:0 };
+  pillars.forEach(p => {
+    if (p.stem   !== null) counts[STEM_DIM[p.stem]]++;
+    if (p.branch !== null) counts[BRANCH_DIM[p.branch]]++;
+  });
+  // Normalize to 0-100 (max possible = all 8 chars same element)
+  const total = Object.values(counts).reduce((s,v) => s+v, 0);
+  const scores = {};
+  Object.keys(counts).forEach(k => {
+    scores[k] = total > 0 ? Math.round((counts[k] / total) * 100) : 20;
+  });
+  return { scores, counts };
+}
+
+let baziPillars  = null;   // computed pillars
+let baziElemData = null;   // { scores, counts }
+
+function onBaziInput() {
+  const year   = parseInt(document.getElementById('bazi-year').value);
+  const month  = parseInt(document.getElementById('bazi-month').value);
+  const day    = parseInt(document.getElementById('bazi-day').value);
+  const unknownHour = document.getElementById('bazi-unknown-hour').checked;
+  const hourVal = document.getElementById('bazi-hour').value;
+  const hour   = unknownHour ? null : (hourVal !== '' ? parseInt(hourVal) : null);
+
+  // Disable hour select if unknown
+  document.getElementById('bazi-hour').disabled = unknownHour;
+
+  const valid = year >= 1900 && year <= 2010 && month >= 1 && month <= 12 && day >= 1 && day <= 31;
+
+  const preview  = document.getElementById('pillars-preview');
+  const noteEl   = document.getElementById('bazi-note');
+  const confirmBtn = document.getElementById('btn-bazi-confirm');
+
+  if (!valid) {
+    preview.classList.remove('show');
+    noteEl.style.display = '';
+    noteEl.textContent = '请填写出生年（1900–2010）、月、日后自动推算';
+    confirmBtn.style.display = 'none';
+    return;
+  }
+
+  // Compute
+  baziPillars  = calcBazi(year, month, day, hour);
+  baziElemData = baziToElements(baziPillars);
+
+  // Render pillars
+  renderPillarsPreview(baziPillars, baziElemData);
+
+  noteEl.style.display = 'none';
+  preview.classList.add('show');
+  confirmBtn.style.display = '';
+
+  // Hour hint
+  if (!unknownHour && hour === null) {
+    confirmBtn.style.display = 'none';
+    document.getElementById('bazi-note').style.display = '';
+    document.getElementById('bazi-note').textContent = '请选择出生时辰，或勾选"不知道时辰"';
+  }
+}
+
+function renderPillarsPreview(pillars, elemData) {
+  const row = document.getElementById('pillars-row');
+  row.innerHTML = pillars.map(p => {
+    const stemName   = p.stem   !== null ? STEMS[p.stem]   : '？';
+    const branchName = p.branch !== null ? BRANCHES[p.branch] : '？';
+    const stemDim    = p.stem   !== null ? STEM_DIM[p.stem]   : null;
+    const branchDim  = p.branch !== null ? BRANCH_DIM[p.branch] : null;
+    const stemColor   = stemDim   ? DIM_COLOR[stemDim]   : 'rgba(224,218,205,0.25)';
+    const branchColor = branchDim ? DIM_COLOR[branchDim] : 'rgba(224,218,205,0.25)';
+    const stemEl   = stemDim   ? DIM_NAME[stemDim]   : '';
+    const branchEl = branchDim ? DIM_NAME[branchDim] : '';
+    return `
+      <div class="pillar-card">
+        <div class="pillar-label">${p.label}</div>
+        <div class="pillar-chars">
+          <div class="pillar-stem"  style="color:${stemColor}">${stemName}</div>
+          <div class="pillar-branch" style="color:${branchColor}">${branchName}</div>
+        </div>
+        <div class="pillar-el-tag" style="color:${stemColor}">${stemEl}·${branchEl}</div>
+      </div>`;
+  }).join('');
+
+  // Render element bars
+  const barsEl = document.getElementById('bazi-el-bars');
+  const dims = ['A','B','C','D','E'];
+  barsEl.innerHTML = dims.map(d => `
+    <div class="bazi-el-row">
+      <div class="bazi-el-name" style="color:${DIM_COLOR[d]}">${DIM_NAME[d]}</div>
+      <div class="bazi-el-track">
+        <div class="bazi-el-fill" style="background:${DIM_COLOR[d]};width:0%" data-target="${elemData.scores[d]}%"></div>
+      </div>
+      <div class="bazi-el-pct" style="color:${DIM_COLOR[d]}">${elemData.scores[d]}%</div>
+    </div>
+  `).join('');
+
+  setTimeout(() => {
+    document.querySelectorAll('#bazi-el-bars .bazi-el-fill').forEach(el => {
+      el.style.width = el.dataset.target;
+    });
+  }, 80);
+}
+
+function confirmBazi() {
   currentQ = 0;
   answers.fill(undefined);
   renderQuestion();
@@ -1227,13 +1651,24 @@ function calculate() {
     Object.keys(scores).forEach(k => {
       normalized[k] = Math.round(((scores[k] + maxPerDim) / (2 * maxPerDim)) * 100);
     });
+
+    // ── Blend bazi (先天 30%) with questionnaire (后天 70%) ──
+    const blended = {};
+    if (baziElemData) {
+      Object.keys(normalized).forEach(k => {
+        blended[k] = Math.round(0.7 * normalized[k] + 0.3 * baziElemData.scores[k]);
+      });
+    } else {
+      Object.assign(blended, normalized);
+    }
+
     const dims = ['A','B','C','D','E'];
 
-    // Cosine similarity vs each city
+    // Cosine similarity vs each city (using blended scores)
     const ranked = CITIES.map(city => {
       let dot=0, magU=0, magC=0;
       dims.forEach(d => {
-        const u = normalized[d], c = city.elProfile[d];
+        const u = blended[d], c = city.elProfile[d];
         dot += u*c; magU += u*u; magC += c*c;
       });
       const sim = dot / (Math.sqrt(magU)*Math.sqrt(magC) + 1e-9);
@@ -1247,7 +1682,7 @@ function calculate() {
       simPct: Math.round((r.sim / topSim) * 100)
     }));
 
-    showResult(top3[0], normalized, top3);
+    showResult(top3[0], blended, top3);
   }, 2400);
 }
 
@@ -1353,6 +1788,19 @@ function showResult(city, normalized, top3) {
 
   showScreen('result-screen');
 
+  // Show bazi source tag if bazi was used
+  const baziInfo = document.getElementById('bazi-source-info');
+  const baziMini = document.getElementById('bazi-pillars-mini');
+  if (baziPillars && baziElemData) {
+    baziInfo.style.display = '';
+    baziMini.textContent = baziPillars
+      .filter(p => p.stem !== null)
+      .map(p => STEMS[p.stem] + BRANCHES[p.branch])
+      .join(' · ');
+  } else {
+    baziInfo.style.display = 'none';
+  }
+
   // Animate bars after paint
   setTimeout(() => {
     document.querySelectorAll('.p-bar-fill, .top3-pct-fill').forEach(bar => {
@@ -1365,6 +1813,18 @@ function showResult(city, normalized, top3) {
 function restartTest() {
   document.documentElement.style.removeProperty('--el-color');
   document.documentElement.style.removeProperty('--el-glow');
+  // Reset bazi
+  baziPillars = null;
+  baziElemData = null;
+  document.getElementById('bazi-year').value = '';
+  document.getElementById('bazi-month').value = '';
+  document.getElementById('bazi-day').value = '';
+  document.getElementById('bazi-hour').value = '';
+  document.getElementById('bazi-unknown-hour').checked = false;
+  document.getElementById('pillars-preview').classList.remove('show');
+  document.getElementById('btn-bazi-confirm').style.display = 'none';
+  document.getElementById('bazi-note').style.display = '';
+  document.getElementById('bazi-note').textContent = '请填写出生年（1900–2010）、月、日后自动推算';
   showScreen('intro-screen');
 }
 
